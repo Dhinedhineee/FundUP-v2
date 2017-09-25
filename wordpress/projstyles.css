@@ -1,0 +1,29 @@
+#asidegoal { 
+    float: right;
+    position: inline;
+    width: 25%;
+    font-size: 15px;
+    margin-top: 30px;
+    margin-right: 50px;
+    padding: 30px 30px 10px 30px;
+    border: 1px solid;
+}
+
+#contentgoal {
+    position: relative;
+    padding-top: 5%;
+    clear: left;
+    padding-left: 5%;
+    width: 70%;
+}
+
+#contentgoal p {
+    text-indent: justify;
+}
+
+#contentgoal img {
+    padding: 30px 30px 30px 30px;
+    margin: 0px auto;
+    text-align: center;
+    display: block;
+}
