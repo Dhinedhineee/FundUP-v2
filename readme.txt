@@ -16,6 +16,6 @@ Happy coding. :)
 ========================================
 List of Plugins, Tables, and Other Notes
 ========================================
->
+> Profile Builder Plugin for User Registration, Log in, Edit User Profile
 >
 >
