@@ -398,3 +398,13 @@ require get_template_directory() . '/inc/customizer.php';
  * Add theme info page
  */
 require get_template_directory() . '/inc/dashboard.php';
+
+add_filter('wp_nav_menu_items', 'add_logout_link', 10, 2);
+function add_logout_link($items, $args) {
+   if ($args->theme_location == 'primary') {
+      if (is_user_logged_in()) {
+         $items .= '<li class="right"><a href="'. wp_logout_url(home_url()) .'">'. __("Log Out") .'</a></li>';
+      }
+   }
+   return $items;
+}
