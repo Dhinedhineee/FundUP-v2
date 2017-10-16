@@ -15,11 +15,6 @@ a {
 h2 {
     text-align: center;
 }
-  /* Other style */
-  body {
-    padding: 2%;
-  }
-
 
 </style>
 <?php
