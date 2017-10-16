@@ -1,3 +1,27 @@
+<style>
+div.item {
+    vertical-align: top;
+    display: inline-block;
+    text-align: center;
+    width: 360px;
+}
+img {
+    background-color: grey;
+}
+
+a {
+    text-decoration: none;
+}
+h2 {
+    text-align: center;
+}
+  /* Other style */
+  body {
+    padding: 2%;
+  }
+
+
+</style>
 <?php
 $id       = get_theme_mod( 'onepress_features_id', esc_html__('features', 'onepress') );
 $disable  = get_theme_mod( 'onepress_features_disable' ) == 1 ? true : false;
@@ -27,42 +51,38 @@ if ( !$disable && !empty( $data ) ) {
         <?php } ?>
         <div class="section-content">
             <div class="row">
-            <?php
-            $layout = intval( get_theme_mod( 'onepress_features_layout', 3 ) );
-            foreach ( $data as $k => $f ) {
-                $media = '';
-                $f =  wp_parse_args( $f, array(
-                    'icon_type' => 'icon',
-                    'icon' => 'gg',
-                    'image' => '',
-                    'link' => '',
-                    'title' => '',
-                    'desc' => '',
-                ) );
-                if ( $f['icon_type'] == 'image' && $f['image'] ){
-                    $url = onepress_get_media_url( $f['image'] );
-                    if ( $url ) {
-                        $media = '<span class="icon-image"><img src="'.esc_url( $url ).'" alt=""></span>';
-                    }
-                } else if ( $f['icon'] ) {
-                    $f['icon'] = trim( $f['icon'] );
-                    $media = '<span class="fa-stack fa-5x"><i class="fa fa-circle fa-stack-2x icon-background-default"></i> <i class="feature-icon fa '.esc_attr( $f['icon'] ).' fa-stack-1x"></i></span>';
-                }
+              <?php
+              $link = mysqli_connect("localhost", "root", "", "wordpress");
 
-                ?>
-                <div class="feature-item col-lg-<?php echo esc_attr( $layout ); ?> col-sm-6 wow slideInUp">
-                    <div class="feature-media">
-                        <?php if ( $f['link'] ) { ?><a href="<?php echo esc_url( $f['link']  ); ?>"><?php } ?>
-                        <?php echo $media; ?>
-                        <?php if ( $f['link'] )  { ?></a><?php } ?>
-                    </div>
-                    <h4><?php if ( $f['link'] ) { ?><a href="<?php echo esc_url( $f['link']  ); ?>"><?php } ?><?php echo esc_html( $f['title'] ); ?><?php if ( $f['link'] )  { ?></a><?php } ?></h4>
-                    <div class="feature-item-content"><?php echo apply_filters( 'the_content', $f['desc'] ); ?></div>
-                </div>
-            <?php
-            }// end loop featues
+              /* check connection */
+              if (mysqli_connect_errno()) {
+                  printf("Connect failed: %s\n", mysqli_connect_error());
+                  exit();
+              }
 
-            ?>
+              $query = "SELECT * FROM projects ORDER by proj_goal-proj_fund";
+
+              if ($result = mysqli_query($link, $query)) {
+                  $i=0;
+                  /* fetch associative array */
+                  while (($row = mysqli_fetch_assoc($result)) && $i<3 ) {
+                  printf ("<div class=\"item\">
+                  <a href=\"http://localhost/wordpress/projinfo/?view=%s\">
+                  <span class=\"icon-image\"><img src=\"../wp-content/uploads/2017/09/%s.jpg\"></span>
+                  %s <br> by %s
+                  </a>
+                  <p style=\"overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;\">%s</p>
+                  </div>", $row["proj_title"],$row["proj_image"],$row["proj_title"],$row["proj_user"],$row["proj_info"]);
+                  $i++;
+                  }
+
+                  /* free result set */
+                  mysqli_free_result($result);
+              }
+
+              /* close connection */
+              mysqli_close($link);
+              ?>
             </div>
         </div>
     </div>
