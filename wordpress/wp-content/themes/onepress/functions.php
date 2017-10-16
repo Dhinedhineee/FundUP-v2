@@ -408,3 +408,59 @@ function add_logout_link($items, $args) {
    }
    return $items;
 }
+
+add_action('wpcf7_before_send_mail', 'save_form' );
+ 
+function save_form( $wpcf7 ) {
+
+    global $wpdb;
+    $submission = WPCF7_Submission::get_instance();
+ 
+    if ( $submission ) {
+ 
+        $submitted = array();
+        $submitted['posted_data'] = $submission->get_posted_data();
+        $image = $submission->uploaded_files();
+        $current_user = wp_get_current_user();
+        $current_user_name = $current_user->user_login;
+        $upload_dir = wp_upload_dir();
+        $users_folder_dir = $upload_dir['basedir'].'/users';
+        $init_goal = 0;
+       
+        if (isset($current_user_name) && !empty($users_folder_dir)){
+            $user_dirname = $users_folder_dir.'/'.$current_user_name;
+            if (!file_exists($user_dirname)){
+                wp_mkdir_p($user_dirname);
+            }
+            
+            foreach ($image as $file_key => $file) {
+                copy($file, $user_dirname.'/'.basename($file));
+                $submitted['image'] = basename($file);
+            }
+        }
+ 
+    }
+    $wpdb->insert( 'projects', 
+        array( 
+                'proj_title' => $submitted['posted_data']['proj-name'], 
+                'proj_user' => $current_user_name,
+                'proj_goal' => $submitted['posted_data']['goal-amount'],
+                'proj_fund' => $init_goal,
+                'proj_image' => $submitted['image'],
+                'proj_info' => $submitted['posted_data']['proj-info'],
+                'proj_date' => date('Y-m-d H:i:s')
+        )
+    );
+}
+
+add_action('wp_footer', 'add_this_script_footer'); 
+
+function add_this_script_footer(){ ?>
+ 
+    <script>
+    document.addEventListener( 'wpcf7mailsent', function( event ) {
+        location = 'http://localhost/wordpress';
+    }, false );
+    </script>
+ 
+<?php } 
