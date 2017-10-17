@@ -102,15 +102,17 @@
 					}?><br><hr></div>
 				<br><h5 style="font-size: 18px; color:#7b1113;">PLEDGERS' LIST</h5>
 				<ul><?php
+						$pledgecount = 0;
 						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
 						if(IsSet($result))
 							foreach ($result as $list) {
+								$pledgecount++;
 								if($list['anon'] == 1)	$pledger = "Anonymous";
 								else 					$pledger = $list['user'];
 								$pledge_amount = $list['fund_given'];  #OPTIONAL PLEDGE AMOUNT DISPLAY  
 								echo '<li>'.$pledger.' - P'.number_format($pledge_amount).'</li> ';
 							}					
-						else echo "<p>Be the first to pledge!</p>";
+						if(!$pledgecount) echo "<p>No pledgers yet. Be the first to pledge!</p>";
 				?></ul>
 			</div>
 		</div>
@@ -120,11 +122,13 @@
 			<p style="font-weight: 600; font-size: 18px; color:#7b1113;">PLEDGER'S COMMENTS</p>
 			<?php
 				$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
-				if(IsSet($result))
+				$commentcount = 0;
+				if(IsSet($result)){
 					foreach ($result as $list) {
 						$user_comment = $list['user_comment'];
 						$action_date = $list['action_date'];
 						if($user_comment != ''){
+							$commentcount++;
 							echo '<div id="pledgecomment">';
 							echo '<hr>';
 								if($list['anon'] == 1)	$pledger = "Anonymous";
@@ -150,9 +154,9 @@
 								echo '</div>';
 							echo '</div>';
 						}
-					}					
-				else echo "<p>No comments yet!</p>";
-
+					}				
+				}	
+				if(!$commentcount)	echo "<p style='padding-left:20px;'>No comments yet. Please pledge first to be able to leave comments!</p>";
 				echo '<hr>';
 			?>
 		</div>	
