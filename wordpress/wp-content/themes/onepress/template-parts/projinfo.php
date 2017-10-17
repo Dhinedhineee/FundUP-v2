@@ -44,7 +44,7 @@
 					if(IsSet($proj_user))	echo "<p><h4>by $proj_user</h4></p>";
 					else 					echo "<p><h4>User not found</h4></p>";
 					if(IsSet($proj_image)){
-						$imgloc = "/wordpress/wp-content/uploads/2017/09/".$proj_image.".jpg";
+						$imgloc = "/wordpress/wp-content/uploads/users/".$proj_image;
 						echo '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" >';
 					}
 					else 					echo '<img src ="#" alt="No image available for this project." id=\"contentimg\" >';
