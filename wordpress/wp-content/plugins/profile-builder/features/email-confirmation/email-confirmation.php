@@ -164,8 +164,8 @@ function wppb_add_meta_to_user_on_activation( $user_id, $password, $meta ){
 	if( !empty( $meta['role'] ) )
 		$user->set_role( $meta['role'] ); //update the users role (s)he registered for
 
-    if( !empty( $meta['first_name'] ) && !empty( $meta['last_name'] ) )
-        wp_update_user(array('ID' => $user_id, 'display_name' => $meta['first_name'].' '.$meta['last_name'] ));
+    if( !empty( $meta['first_name'] ) )
+        wp_update_user(array('ID' => $user_id, 'display_name' => $meta['first_name'] ));
     else if( !empty( $meta['nickname'] ) )
         wp_update_user(array('ID' => $user_id, 'display_name' => $meta['nickname'] ));
 
