@@ -23,17 +23,29 @@
     border: 2px ridge black;
     padding: 10px;
     overflow: hidden;
+    font-size: 15px; 
+    letter-spacing:1px;
 }
 
 #asidedonor {
-    text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: 13px;
     font-family: "Raleway", Helvetica, Arial, sans-serif;
 }
 
+#asidedonor h5 {
+     font-size: 18px; 
+     color:#7b1113;"
+}
 
-#contentgoal, #comments{
+#donatewidget h2{
+     font-weight: 700; 
+     text-align:center;
+     color:#7b1113;
+     font-size: 18px;
+}
+
+#contentgoal, #projcomments{
     clear:both;
     border: none;
     display: inline-block;
@@ -43,8 +55,14 @@
     padding-right: 4%;
 }
 
-#contentgoal p {
-    text-indent: justify;
+#contentgoal h2 {
+     color:#7b1113;
+}
+
+#projcomments p {
+     font-weight: 600; 
+     font-size: 18px; 
+     color:#7b1113;
 }
 
 #contentgoal img {
@@ -75,12 +93,11 @@
 }
 
 
-
 @media only screen and (max-width: 999px) {
     #sidebarprojinfo {
         width: 30%;
     }   
-    #contentgoal, #comments{
+    #contentgoal, #projcomments{
         width: 65%;
     }
 }
@@ -89,14 +106,14 @@
     #sidebarprojinfo {
         width: 30%;
     }   
-    #contentgoal, #comments{
+    #contentgoal, #projcomments{
         width: 62%;
     }
 }
 
 
 @media only screen and (max-width: 450px) {
-    #contentgoal, #comments{
+    #contentgoal, #projcomments{
         border: 0px;
         width: 100%;
         padding: 20px;

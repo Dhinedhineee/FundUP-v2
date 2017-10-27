@@ -22,13 +22,12 @@
 
 		global $wpdb;
 		$result = $wpdb->get_row("SELECT * FROM projects WHERE proj_title='$proj_title'", ARRAY_A);
-
-		$proj_fund = $result['proj_fund'];
+		$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 		$proj_fund = $proj_fund + $pledge_amount;
 		$wpdb->update('projects', array('proj_fund' => $proj_fund), array( 'proj_title' => $proj_title ));
 		
 		$current_user = wp_get_current_user();
-		$pledger = $current_user->user_login;
+		$pledger = $current_user->display_name;	
 		if(isset($_POST['Anonymous']) && $_POST['Anonymous'] == 'Yes') $anon = 1;
 		else 	$anon = NULL;
       	$wpdb->insert('user_actions', 
