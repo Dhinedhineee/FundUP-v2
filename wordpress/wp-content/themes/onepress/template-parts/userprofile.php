@@ -14,7 +14,7 @@
 
 	global $wpdb;
 	$info = $wpdb->get_row("SELECT * FROM wp_users WHERE ID=$user_ID", ARRAY_A);
-	/* warning message: user does not exist if info = NULL */
+	$info2 = $wpdb->get_row("SELECT meta_value FROM wp_usermeta WHERE ID=$user_ID AND meta_key='description'", ARRAY_A);
 
 	if(!isset($info)){
 		header('Location: http://localhost/wordpress');
@@ -22,7 +22,9 @@
 	} else {
 		$user_name = $info['display_name'];
 		$user_email = $info['user_email'];
-		/* hardcoded for now, will set up a form for additional information (e.g biography, other contact info, etc.)*/
+		$user_website = $info['user_url'];
+		$user_bio = $info2['meta_value'];
+		/* hardcoded for now*/
 		$user_image = 'thinking.png';
 	}
 
@@ -47,6 +49,8 @@
 						echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
 					?>
 					<?php echo "Email: $user_email<br />" ?>
+					<?php if ($user_website) echo "Website: $user_website<br />" ?>
+					<?php if ($user_bio) echo "Bio: $user_bio<br />" ?>
 
 				</main>
 			</div>
