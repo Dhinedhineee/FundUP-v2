@@ -63,7 +63,7 @@ if ( !$disable && !empty( $data ) ) {
                   while (($row = mysqli_fetch_assoc($result)) && $i<3 ) {
                   printf ("<div class=\"item\">
                   <a href=\"http://localhost/wordpress/projinfo/?view=%s\">
-                  <span class=\"icon-image\"><img src=\"../wp-content/uploads/2017/09/%s.jpg\"></span>
+                  <span class=\"icon-image\"><img src=\"wordrpress/wp-content/uploads/2017/09/%s\"></span>
                   %s <br> by %s
                   </a>
                   <p style=\"overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;\">%s</p>
