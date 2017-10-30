@@ -19,7 +19,6 @@
 		$proj_title = htmlspecialchars($_POST['proj_title']);
 		$pledge_amount = htmlspecialchars($_POST['pledge_amount']);
 		$user_comment = htmlspecialchars($_POST['user_comment']);
-
 		global $wpdb;
 		$result = $wpdb->get_row("SELECT * FROM projects WHERE proj_title='$proj_title'", ARRAY_A);
 		$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
@@ -27,7 +26,7 @@
 		$wpdb->update('projects', array('proj_fund' => $proj_fund), array( 'proj_title' => $proj_title ));
 		
 		$current_user = wp_get_current_user();
-		$pledger = $current_user->display_name;	
+		$pledger = $current_user->display_name;
 		if(isset($_POST['Anonymous']) && $_POST['Anonymous'] == 'Yes') $anon = 1;
 		else 	$anon = NULL;
       	$wpdb->insert('user_actions', 

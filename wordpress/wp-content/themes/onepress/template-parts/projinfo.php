@@ -14,7 +14,7 @@
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_title='$proj_title'";
 	$result = $wpdb->get_row($query, ARRAY_A);
-	//var_dump($re\	sult);		#for debugging
+	//var_dump($result);		#for debugging
 		if(!isset($result)){
 			header('Location: http://localhost/wordpress');die();
 		} else {
@@ -23,10 +23,12 @@
 			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 			$proj_image = $result['proj_image'];
 			$proj_info = $result['proj_info'];
+			$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name=".$proj_user);
 		}
 	$proj_info = str_replace("\n", "<br><br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
 
-	get_header();			#HEADER SETUP
+	#HEADER SETUP
+	get_header();
 	$layout = onepress_get_layout();
 	echo onepress_breadcrumb();
 ?>
@@ -39,7 +41,7 @@
 			<?php 	
 				if(IsSet($proj_title))	echo "<p><h2>$proj_title</h2></p>";
 				else 					echo "<h2>Project name not found</h2>";
-				if(IsSet($proj_user))	echo "<p><h4>by $proj_user</h4></p>";
+				if(IsSet($proj_user))	echo "<p><h4>by <a style='color:#7b1113;' href='http://localhost/wordpress/user-profile/?view=$user_id'>$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
 					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_image;
@@ -70,34 +72,34 @@
 				<div id="donatewidget">
 				<hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>
 				<?php
-					if (!is_user_logged_in() ){
-						echo "<p style='text-transform:none; text-align:center; color:black;'>
-							You need to be a registered user to donate. Click here to 
-							<a href='http://localhost/wordpress/signup/'><strong>register</strong></a> or 
-							<a href='http://localhost/wordpress/login/''><strong>sign in</strong></a>.
-							</p>";
-					} else {
-						$current_user = wp_get_current_user();
-						$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user='$current_user->display_name'";
-						$user_donate = $wpdb->get_var($query);
-						if(!IsSet($user_donate)) 	$user_donate = 0;
-						echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P$user_donate in the project!</p>";
-						if($user_donate > 0)	echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO DONATE AGAIN?</strong></p>";	
-						echo "<form action='pledge-processing' method='post'>
-									<input type='hidden' name='proj_title' value='$proj_title'>
-							        <label for='pledge'><strong>PLEDGE AMOUNT:</strong></label>
-							        <input type='number' id='pledge' name='pledge_amount' min='1' style='width:100%;' required>
-							        <br><label for='comment'><strong>ANY COMMENTS? (Optional)</strong></label>
-	        						<textarea id='comment' name='user_comment' style='width:100%;'></textarea>	
-							    <div style='font-size:10px;'>
-							    	<input type='checkbox' name='Anonymous' value='Yes'/>Check this box if you want to be Anonymous :)
-								</div>
-								<br>
-							    <div style='text-align:center;'>
-	  								<button class='btn btn-secondary-outline btn-lg' type='submit' style='background-color:#7b1113; color:white;'>Donate!</button>
-								</div></form>";
-					}
-				?><br><hr></div>
+				if (!is_user_logged_in() ){
+					echo "<p style='text-transform:none; text-align:center; color:black;'>
+						You need to be a registered user to donate. Click here to 
+						<a href='http://localhost/wordpress/signup/'><strong>register</strong></a> or 
+						<a href='http://localhost/wordpress/login/''><strong>sign in</strong></a>.
+						</p>";
+				} else {
+					$current_user = wp_get_current_user();
+					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user='$current_user->user_login'";
+					$user_donate = $wpdb->get_var($query);
+					
+					if(!IsSet($user_donate)) 	$user_donate = 0;
+					echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P$user_donate in the project!</p>";
+					if($user_donate > 0)	echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO DONATE AGAIN?</strong></p>";	
+					echo "<form action='pledge-processing' method='post'>
+								<input type='hidden' name='proj_title' value='$proj_title'>
+						        <label for='pledge'><strong>PLEDGE AMOUNT:</strong></label>
+						        <input type='number' id='pledge' name='pledge_amount' min='1' style='width:100%;' required>
+						        <br><label for='comment'><strong>ANY COMMENTS? (Optional)</strong></label>
+        						<textarea id='comment' name='user_comment' style='width:100%;'></textarea>	
+						    <div style='font-size:10px;'>
+						    	<input type='checkbox' name='Anonymous' value='Yes'/>Check this box if you want to be Anonymous :)
+							</div>
+							<br>
+						    <div style='text-align:center;'>
+  								<button class='btn btn-secondary-outline btn-lg' type='submit' style='background-color:#7b1113; color:white;'>Donate!</button>
+							</div></form>";
+					}?><br><hr></div>
 				<br><h5>PLEDGERS' LIST</h5>
 				<ul><?php
 						$pledgecount = 0;
@@ -107,7 +109,7 @@
 								$pledgecount++;
 								if($list['anon'] == 1)	$pledger = "Anonymous";
 								else 					$pledger = $list['user'];
-								$pledge_amount = $list['fund_given'];
+								$pledge_amount = $list['fund_given']; 
 								echo '<li>'.$pledger.' - P'.number_format($pledge_amount).'</li> ';
 							}					
 						if(!$pledgecount) echo "<p>No pledgers yet. Be the first to pledge!</p>";
@@ -116,7 +118,7 @@
 		</div>
 		
 		<div id="projcomments">
-			<hr><p>PLEDGERS' COMMENTS</p>
+			<hr><p>PLEDGER'S COMMENTS</p>
 			<?php
 				$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
 				$commentcount = 0;
@@ -127,13 +129,14 @@
 						if($user_comment != ''){
 							$commentcount++;
 							echo '<div id="pledgecomment">';	echo '<hr>';
-								if($list['anon'] == 1)	$pledger = "Anonymous";
-								else 					$pledger = $list['user'];	
-								
 								echo '<div id="pledgename">';
-									echo "$pledger";	
+									if($list['anon'] == 1)	echo "Anonymous";
+									else{
+										$pledger = $list['user'];	
+										$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name='$pledger'");
+										echo "<a href='http://localhost/wordpress/user-profile/?view=$user_id'>$pledger</a>";	
+									}
 								echo '</div>';
-								
 								echo '<div id="pledgedate">';
 									date_default_timezone_set('Asia/Manila');
 									$hey = new DateTime($action_date);
@@ -147,7 +150,6 @@
 									else 					{$p=$et->s; echo $p.' second';}
 									if($p>1)				echo 's';	echo ' ago<br>';							
 								echo '</div>';
-
 								echo '<div id="pledgecomdet">';
 									echo $user_comment;
 								echo '</div>';
@@ -155,7 +157,7 @@
 						}
 					}				
 				}	
-				if(!$commentcount)	echo "<p style='padding-left:20px;'>No projcomments yet. Please pledge first to be able to leave projcomments!</p>";
+				if(!$commentcount)	echo "<p style='padding-left:20px;'>No comments yet. Please pledge first to be able to leave comments!</p>";
 				echo '<hr>';
 			?>
 		</div>	
