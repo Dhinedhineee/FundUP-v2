@@ -118,7 +118,7 @@
 		</div>
 		
 		<div id="projcomments">
-			<hr><p>PLEDGER'S COMMENTS</p>
+			<hr><p style="color: #7b1113;">PLEDGERS' COMMENTS</p>
 			<?php
 				$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
 				$commentcount = 0;
@@ -129,7 +129,7 @@
 						if($user_comment != ''){
 							$commentcount++;
 							echo '<div id="pledgecomment">';	echo '<hr>';
-								echo '<div id="pledgename">';
+								echo '<div id="pledgename" style="color: #7b1113;">';
 									if($list['anon'] == 1)	echo "Anonymous";
 									else{
 										$pledger = $list['user'];	
