@@ -16,6 +16,7 @@
 	$result = $wpdb->get_row($query, ARRAY_A);
 	//var_dump($result);		#for debugging
 		if(!isset($result)){
+			die();
 			header('Location: http://localhost/wordpress');die();
 		} else {
 			$proj_user = $result['proj_user'];
@@ -23,7 +24,7 @@
 			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 			$proj_image = $result['proj_image'];
 			$proj_info = $result['proj_info'];
-			$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name=".$proj_user);
+			$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name='$proj_user'");
 		}
 	$proj_info = str_replace("\n", "<br><br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
 
@@ -41,7 +42,7 @@
 			<?php 	
 				if(IsSet($proj_title))	echo "<p><h2>$proj_title</h2></p>";
 				else 					echo "<h2>Project name not found</h2>";
-				if(IsSet($proj_user))	echo "<p><h4>by <a style='color:#7b1113;' href='http://localhost/wordpress/user-profile/?view=$user_id'>$proj_user</a></h4></p>";
+				if(IsSet($proj_user))	echo "<p><h4>by <a href='http://localhost/wordpress/user-profile/?view=$user_id' style='color:#7b1113;' >$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
 					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_image;
@@ -63,9 +64,8 @@
 				?>		
 				<br><p style="color:#7b1113;"><b>Raised PHP</b></p>
 				<?php 
-					if(IsSet($proj_fund))	{echo "<span>P</span>";
-											echo "<span style='float:right; letter-spacing:2px;  overflow-wrap:break-word;'>".number_format($proj_fund)."</span>";}
-					else 					echo "<p>Amount raised not defined</p>";
+					echo "<span>P</span>";
+					echo "<span style='float:right; letter-spacing:2px;  overflow-wrap:break-word;'>".number_format($proj_fund)."</span>";
 				?>
 			</div><br><br>
 			<div id="asidedonor">
@@ -80,7 +80,7 @@
 						</p>";
 				} else {
 					$current_user = wp_get_current_user();
-					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user='$current_user->user_login'";
+					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user='$current_user->display_name'";
 					$user_donate = $wpdb->get_var($query);
 					
 					if(!IsSet($user_donate)) 	$user_donate = 0;
@@ -97,9 +97,15 @@
 							</div>
 							<br>
 						    <div style='text-align:center;'>
-  								<button class='btn btn-secondary-outline btn-lg' type='submit' style='background-color:#7b1113; color:white;'>Donate!</button>
-							</div></form>";
-					}?><br><hr></div>
+  								<button class='btn btn-secondary-outline btn-lg' type='submit' id='dbutton' style='background-color:#7b1113; color:white;'>Donate!</button>
+							</div></form>
+							<p id='ptcontainer'></p>";
+					}?>
+					<script>
+						document.getElementById("dbutton").addEventListener("click", thankyou);
+						function thankyou(){document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";}
+					</script>
+					<br><hr></div>
 				<br><h5>PLEDGERS' LIST</h5>
 				<ul><?php
 						$pledgecount = 0;
