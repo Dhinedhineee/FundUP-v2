@@ -14,7 +14,7 @@
 
 	global $wpdb;
 	$info = $wpdb->get_row("SELECT * FROM wp_users WHERE ID=$user_ID", ARRAY_A);
-	$info2 = $wpdb->get_row("SELECT meta_value FROM wp_usermeta WHERE ID=$user_ID AND meta_key='description'", ARRAY_A);
+	$info2 = $wpdb->get_row("SELECT meta_value FROM wp_usermeta WHERE user_id=$user_ID AND meta_key='description'", ARRAY_A);
 
 	if(!isset($info)){
 		header('Location: http://localhost/wordpress');
@@ -33,7 +33,7 @@
 	echo onepress_breadcrumb();
 ?>
 
-<link rel="stylesheet" type="text/css" href="../wp-content/themes/onepress/assets/css/userprofile.css">
+<link rel="stylesheet" type="text/css" href="../wp-content/themes/onepress/assets/css/userprofile.css?ver=<?php echo rand(111,999)?>">
 
 	<div id="content" class="site-content">
 
@@ -43,7 +43,7 @@
 			<div id="primary" class="content-area">
 				<main id="main" class="site-main" role="main">
 
-					<?php echo '<h1 class="name">'.$user_name.'</h1><br />' ?>
+					<?php echo '<h1 class="name">'.$user_name.'</h1>' ?>
 					<?php
 						$img = "/wordpress/wp-content/uploads/users/".$user_image;
 						echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
