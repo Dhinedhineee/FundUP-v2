@@ -462,7 +462,7 @@ function add_this_script_footer(){ ?>
  
     <script>
     document.addEventListener( 'wpcf7mailsent', function( event ) {
-        location = 'http://localhost/wordpress';
+        location = 'http://localhost/wordpress/projinfo/?view=' + document.getElementsByTagName("input")['proj-name'].value;	   ;
     }, false );
     </script>
  
