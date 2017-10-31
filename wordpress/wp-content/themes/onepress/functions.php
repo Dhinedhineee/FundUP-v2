@@ -408,12 +408,15 @@ function add_logout_link($items, $args) {
    }
    return $items;
 }
+global $current_user_name;
+$current_user = wp_get_current_user();
+$current_user_name = $current_user->display_name;
 
 add_action('wpcf7_before_send_mail', 'save_form' );
  
 function save_form( $wpcf7 ) {
 
-    global $wpdb;
+    global $wpdb, $current_user_name;
     $submission = WPCF7_Submission::get_instance();
  
     if ( $submission ) {
@@ -421,8 +424,8 @@ function save_form( $wpcf7 ) {
         $submitted = array();
         $submitted['posted_data'] = $submission->get_posted_data();
         $image = $submission->uploaded_files();
-        $current_user = wp_get_current_user();
-        $current_user_name = $current_user->user_login;
+        //$current_user = wp_get_current_user();
+        //$current_user_name = $current_user->user_login;
         $upload_dir = wp_upload_dir();
         $users_folder_dir = $upload_dir['basedir'].'/users';
         $init_goal = 0;

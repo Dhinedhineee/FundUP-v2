@@ -49,6 +49,16 @@
     font-size: 18px;
 }
 
+#pledgethanks {
+    border: 2px solid #398f14; 
+    margin: 20px 0px; 
+    padding: 0.2em 1em;
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
 #contentgoal, #projcomments{
     clear:both;
     border: none;
