@@ -24,8 +24,7 @@
 		$user_email = $info['user_email'];
 		$user_website = $info['user_url'];
 		$user_bio = $info2['meta_value'];
-		/* hardcoded for now*/
-		$user_image = 'thinking.png';
+		$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
 	}
 
 	get_header();
@@ -45,7 +44,11 @@
 
 					<?php echo '<h1 class="name">'.$user_name.'</h1>' ?>
 					<?php
-						$img = "/wordpress/wp-content/uploads/users/".$user_image;
+						if ($user_image) {
+							$img = "/wordpress".$user_image;
+						} else {
+							$img = "/wordpress/wp-content/default/default.png";
+						}
 						echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
 					?>
 					<?php echo "Email: $user_email<br />" ?>

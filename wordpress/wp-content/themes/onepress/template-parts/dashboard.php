@@ -16,8 +16,7 @@
 
 	$user_name = $info['display_name'];
 	$user_bio = $info2['meta_value'];
-	/* hardcoded for now*/
-	$user_image = 'thinking.png';
+	$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
 
 	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user='$user_name'", ARRAY_A);
 	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user='$user_name'", ARRAY_A);
@@ -39,12 +38,16 @@
 
 					<?php echo '<h1 class="name">Welcome back, '.$user_name.'!</h1>' ?>
 					<?php
-						$img = "/wordpress/wp-content/uploads/users/".$user_image;
+						if ($user_image) {
+							$img = "/wordpress".$user_image;
+						} else {
+							$img = "/wordpress/wp-content/default/default.png";
+						}
 						echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
 					?>
 					<?php echo '<a href="http://localhost/wordpress/user-profile/?view='.$user_ID.'">View Profile</a><br />' ?>
 					<a href="http://localhost/wordpress/edit-profile">Edit Profile</a><br />
-					<a href="http://localhost/wordpress/change-picture">Change Profile Picture</a><br/ >
+					<a href="http://localhost/wordpress/change-profile-picture">Change Profile Picture</a><br/ >
 					<h2 class="label">My Projects</h2>
 					<?php
 						if ($projects) {
