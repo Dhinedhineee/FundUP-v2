@@ -19,8 +19,8 @@
 	/* hardcoded for now*/
 	$user_image = 'thinking.png';
 
-	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user=$user_name", ARRAY_A);
-	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user=$user_name", ARRAY_A);
+	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user='$user_name'", ARRAY_A);
+	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user='$user_name'", ARRAY_A);
 
 	get_header();
 	$layout = onepress_get_layout();
