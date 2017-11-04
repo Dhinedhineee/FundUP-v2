@@ -458,6 +458,55 @@ function save_form( $wpcf7 ) {
 
 add_action('wp_footer', 'add_this_script_footer'); 
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function cf7_proj_goal($atts){
+	extract(shortcode_atts(array(
+		'key' => 0,
+	), $atts));
+	$value = '';
+	if( isset( $_GET[$key] ) ){
+		$value = urldecode($_GET[$key]);
+		global $wpdb;
+		$query = "SELECT proj_goal FROM projects WHERE proj_title='$value'";
+		$result = $wpdb->get_var($query);
+	}
+	return $result;
+}
+add_shortcode('CF7_PROJ_GOAL', 'cf7_proj_goal');
+
+function cf7_proj_info($atts){
+	extract(shortcode_atts(array(
+		'key' => 0,
+	), $atts));
+	$value = '';
+	if( isset( $_GET[$key] ) ){
+		$value = urldecode($_GET[$key]);
+		global $wpdb;
+		$query = "SELECT proj_info FROM projects WHERE proj_title='$value'";
+		$result = $wpdb->get_var($query);
+	}
+	return $result;
+}
+add_shortcode('CF7_PROJ_INFO', 'cf7_proj_info');
+
+function cf7_proj_image($atts){
+	extract(shortcode_atts(array(
+		'key' => 0,
+	), $atts));
+	$value = '';
+	if( isset( $_GET[$key] ) ){
+		$value = urldecode($_GET[$key]);
+		global $wpdb;
+		$query = "SELECT proj_image FROM projects WHERE proj_title='$value'";
+		$result = $wpdb->get_var($query);
+	}
+	return $result;
+}
+add_shortcode('CF7_PROJ_IMAGE', 'cf7_proj_image');
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 function add_this_script_footer(){ ?>
  
     <script>
@@ -466,4 +515,8 @@ function add_this_script_footer(){ ?>
     }, false );
     </script>
  
-<?php } 
+<?php 
+
+
+
+} 
