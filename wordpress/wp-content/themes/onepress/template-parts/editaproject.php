@@ -23,7 +23,7 @@
 
 		
 		<div id="content-inside" class="container no-sidebar">
-			<div id="primary" class="content-area">
+			
 				<main id="main" class="site-main" role="main">
 
 		<article id="post-338" class="post-338 page type-page status-publish hentry">
@@ -34,13 +34,11 @@
 
 </div>
 
-
-
 <?php 
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_title='$proj_title'";
 	$result = $wpdb->get_row($query, ARRAY_A);
-	var_dump($result);		#for debugging
+	//var_dump($result);		#for debugging
 		if(!isset($result)){
 			$url = 'http://localhost/wordpress';
         	redirect($url);
@@ -67,12 +65,11 @@
 	$fundtext = "The project's current fund pledged is P".number_format($proj_fund)."";
 	$proj_image = $result['proj_image'];
 	$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user."/".$proj_image;
-	$imagetext = '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br>';
-	$imageedit = '<p><label> Upload a photo (jpg/jpeg/gif/png, max 10MB)<br /><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png"/><br><span id="FileError"></span></span></label></p>';
+	$imagetext = '<br><img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br><br>';
 ?>
 
 <?php echo'
-		<form action="edit-page-processing" method="post" class="wpcf7-form demo" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
+		<form action="edit-project-processing" method="post" class="wpcf7-form demo" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
 		<p><label> Project Name<br />
     	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name"value="'.$proj_title.'" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" aria-invalid="false" id="proj-name"/>
 		<span id="titlealert"></span></span> </label></p>
@@ -81,43 +78,54 @@
 		<p><label> Project Information<br />
 		<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
 		<span id="infoalert"></span></span> </label></p>
-		<p><label> Project Image <br>
-		<span id="imgcontainer">'.$imagetext.'</span> 
-		<input type="checkbox" id="checkme" name="Image" value="Pic">Do you want to replace your image?
+		<p><label> Project Image
+		<span id="imageshow">'.$imagetext.'</span>
+		<p><label> Upload a file (jpg/jpeg/gif/png, max 10MB) if you want to replace your image<br /><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
 		<span id="imgcontainer2"></span> <br>
 		</label></p>
 		<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-form-control wpcf7-submit" /></p>	
 		<div id="submitted"></div>
 		</form>
 	';
+
+	
 ?>
 
-<script type="text/javascript">
-	document.getElementById("checkme").addEventListener("change", showme);
-	function showme(){
-		if (this.checked){
-			var imageedit = '<?php echo $imageedit; ?>';
-			document.getElementById("imgcontainer2").innerHTML = imageedit;
-			document.getElementById("imgcontainer").innerHTML = "";
-		}else {
-			var imagetext =  '<?php echo $imagetext; ?>';
-			document.getElementById("imgcontainer").innerHTML = imagetext;
-			document.getElementById("imgcontainer2").innerHTML = "";
-		}
+<script>
+	function verifyMe(){
+		var oFile = document.getElementById("proj-image").files[0]; 
+		if (oFile != null){
+        if (oFile.size > 2097152*5) // 2*5 mb for bytes.
+        {
+        	document.getElementById("imageshow").innerHTML = '<?php echo $imagetext; ?>';
+            document.getElementById("FileError").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">FILE SUBMISSION SHOULD NOT EXCEED 10MB.</span>';
+            return "FileSize";
+        }
+        else if (oFile.type == "image/jpeg"||oFile.type == "image/gif"||oFile.type == "image/png"){
+        	document.getElementById("FileError").innerHTML = "";	
+        	document.getElementById("imageshow").innerHTML = "";
+        }
+        else {
+        	document.getElementById("imageshow").innerHTML = '<?php echo $imagetext; ?>';
+        	document.getElementById("FileError").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">FILE SUBMISSION SHOULD ONLY BE OF TYPE JPG/JPEG/GIF/PNG.</span>';
+            return "FileType";	
+        }}else{
+        	document.getElementById("imageshow").innerHTML = '<?php echo $imagetext; ?>';
+        }
 	}
-
 	function submitted(){
-		//alert(document.getElementById("proj-name").value);
 		var x = 0;
 		if (document.getElementById("proj-name").value == ""){
-			document.getElementById("titlealert").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">The field is required.</span>';
+			document.getElementById("titlealert").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">This field is required.</span>';
 			x = 1;
 		}else document.getElementById("titlealert").innerHTML = "";
 		if (document.getElementById("proj-info").value == ""){
-			document.getElementById("infoalert").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">The field is required.</span>';
+			document.getElementById("infoalert").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">This field is required.</span>';
 			x = 1;
 		}else document.getElementById("infoalert").innerHTML = "";
-
+		if (verifyMe() == "FileSize" || verifyMe() == "FileType" ){
+			x = 1;
+		}else document.getElementById("FileError").innerHTML = "";
 		if(x == 1){
 			document.getElementById("submitted").innerHTML ='<div class="wpcf7-response-output wpcf7-display-none wpcf7-validation-errors" role="alert" style="display: block;">One or more fields have an error. Please check and try again.</div>';			
 			return false;
@@ -125,16 +133,16 @@
 			document.getElementById("submitted").innerHTML='<div class="wpcf7-response-output wpcf7-display-none wpcf7-mail-sent-ok" role="alert" style="display: block;">Your project was successfully edited.</div>';
 			return true;
 		}
-
 	}
 </script>
+
+
 
 </div><!-- .entry-content -->
 </article><!-- #post-## -->
 
 					
 				</main><!-- #main -->
-			</div><!-- #primary -->
 
             
 		</div><!--#content-inside -->
