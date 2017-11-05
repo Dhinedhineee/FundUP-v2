@@ -45,7 +45,7 @@
 				if(IsSet($proj_user))	echo "<p><h4>by <a href='http://localhost/wordpress/user-profile/?view=$user_id' style='color:#7b1113;' >$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
-					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_image;
+					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user."/".$proj_image;
 					echo '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" >';
 				}
 				else 					echo '<img src ="#" alt="No image available for this project." id=\"contentimg\" >';
@@ -82,7 +82,7 @@
 					$current_user = wp_get_current_user();
 					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user='$current_user->display_name'";
 					$user_donate = $wpdb->get_var($query);
-					
+						
 					if(!IsSet($user_donate)) 	$user_donate = 0;
 					echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P$user_donate in the project!</p>";
 					if($user_donate > 0)	echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO DONATE AGAIN?</strong></p>";	
