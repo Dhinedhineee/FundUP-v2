@@ -26,7 +26,7 @@
 			$proj_info = $result['proj_info'];
 			$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name='$proj_user'");
 		}
-	$proj_info = str_replace("\n", "<br><br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
+	$proj_info = str_replace("\n", "<br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
 
 	#HEADER SETUP
 	get_header();
