@@ -3,17 +3,24 @@ div.item {
     vertical-align: top;
     display: inline-block;
     text-align: center;
-    width: 360px;
-}
-img {
-    background-color: grey;
+    width: 345px;
+    margin: 1%;
 }
 
-a {
-    text-decoration: none;
+p {
+  text-align: justify;
 }
-h2 {
-    text-align: center;
+
+.thumbnail {
+    margin: auto;
+    height: 43%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.thumbnail img {
+    height: auto;
+    width: 100%;
 }
 
 </style>
@@ -63,11 +70,11 @@ if ( !$disable && !empty( $data ) ) {
                   while (($row = mysqli_fetch_assoc($result)) && $i<3 ) {
                   printf ("<div class=\"item\">
                   <a href=\"http://localhost/wordpress/projinfo/?view=%s\">
-                  <span class=\"icon-image\"><img src=\"wordrpress/wp-content/uploads/users/%s\"></span><br>
+                  <div class=\"thumbnail\"><img src=\"wordpress/wp-content/uploads/users/%s/%s\"></div>
                   %s <br> by %s
                   </a>
                   <p style=\"overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;\">%s</p>
-                  </div>", $row["proj_title"],$row["proj_image"],$row["proj_title"],$row["proj_user"],$row["proj_info"]);
+                  </div>", $row["proj_title"],$row["proj_user"],$row["proj_image"],$row["proj_title"],$row["proj_user"],$row["proj_info"]);
                   $i++;
                   }
 

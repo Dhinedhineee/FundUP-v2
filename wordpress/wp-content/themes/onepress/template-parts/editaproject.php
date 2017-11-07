@@ -68,7 +68,7 @@
 
 <?php echo'
 		<form action="edit-project-processing" method="post" class="wpcf7-form demo" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
-		<p><label> Project Name (Project Name should not be taken already)<br />
+		<p><label> Project Name<br />
     	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name"value="'.$proj_title.'" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" aria-invalid="false" id="proj-name"/>
 		<span id="titlealert"></span></span> </label></p>
 		<p><label> Goal Amount<br />
@@ -76,15 +76,16 @@
 		<p><label> Project Information<br />
 		<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
 		<span id="infoalert"></span></span> </label></p>
-		<p><label> Project Image
+		<p><label> Project Photo
 		<span id="imageshow">'.$imagetext.'</span>
-		<p><label> Upload a file (jpg/jpeg/gif/png, max 7MB) if you want to replace your image<br /><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
-		<span id="imgcontainer2"></span> <br>
+		<p><label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br /><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
+		<span id="imgcontainer2"></span>
 		</label></p>
 		<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-form-control wpcf7-submit" /></p>
 		<input type="hidden" name="origprojname" value="'.$proj_title.'" />
 		<div id="submitted"></div>
 		</form>
+		<br>
 	';
 
 	

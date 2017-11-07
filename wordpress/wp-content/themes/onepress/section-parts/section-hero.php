@@ -44,6 +44,8 @@ if ( $is_parallax ) {
     echo '<div class="parallax-bg" style="background-image: url('.esc_url( $images[0]).');" data-stellar-ratio="0.1" data-stellar-offset-parent="true"></div>';
 }
 
+$current_user = wp_get_current_user();
+
 ?>
 <?php if ( ! $disable && ! empty ( $images ) ) : ?>
 	<section  id="<?php if ( $id != '' ){ echo esc_attr( $id ); } ?>" <?php if ( ! empty ( $images) && ! $is_parallax ) { ?> data-images="<?php echo esc_attr( json_encode( $images ) ); ?>"<?php } ?>
@@ -88,7 +90,7 @@ if ( $is_parallax ) {
 					<div class="hero__content hero-content-style<?php echo esc_attr( $layout ); ?>">
 						<?php if ($hcl1_largetext != '') echo '<h2 class="hero-large-text">' . wp_kses_post($hcl1_largetext) . '</h2>'; ?>
 						<?php if ($hcl1_smalltext != '') echo '<p class="hero-small-text"> ' . do_shortcode( wp_kses_post( $hcl1_smalltext ) ) . '</p>' ?>
-						<?php if ($hcl1_btn1_text != '' && $hcl1_btn1_link != '') echo '<a href="' . esc_url($hcl1_btn1_link) . '" class="btn '.esc_attr( $btn_1_style ).' btn-lg">' . wp_kses_post($hcl1_btn1_text) . '</a>'; ?>
+						<?php if ($hcl1_btn1_text != '' && $hcl1_btn1_link != '' && $current_user->ID == 0) echo '<a href="' . esc_url($hcl1_btn1_link) . '" class="btn '.esc_attr( $btn_1_style ).' btn-lg">' . wp_kses_post($hcl1_btn1_text) . '</a>'; ?>
 						<?php if ($hcl1_btn2_text != '' && $hcl1_btn2_link != '') echo '<a href="' . esc_url($hcl1_btn2_link) . '" class="btn '.esc_attr( $btn_2_style ).' btn-lg">' . wp_kses_post($hcl1_btn2_text) . '</a>'; ?>
 					</div>
 				</div>

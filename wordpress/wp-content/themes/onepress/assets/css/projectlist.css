@@ -1,0 +1,22 @@
+.item {
+    vertical-align: top;
+    display: inline-block;
+    text-align: center;
+    width: 345px;
+    margin: 1%;
+}
+
+p {
+    text-align: justify;
+}
+
+.thumbnail {
+    margin: auto;
+    height: 195px;
+    overflow: hidden;
+}
+
+.thumbnail img {
+    height: auto;
+    width: 100%;
+}
