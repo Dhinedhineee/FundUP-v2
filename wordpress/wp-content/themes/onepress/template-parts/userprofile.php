@@ -24,7 +24,7 @@
 		$user_email = $info['user_email'];
 		$user_website = $info['user_url'];
 		$user_bio = $info2['meta_value'];
-		$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
+		//$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
 	}
 
 	get_header();
@@ -42,18 +42,18 @@
 			<div id="primary" class="content-area">
 				<main id="main" class="site-main" role="main">
 
-					<?php echo '<h1 class="name">'.$user_name.'</h1>' ?>
+					<?php echo '<h1>'.$user_name.'</h1>' ?>
 					<?php
-						if ($user_image) {
-							$img = "/wordpress".$user_image;
-						} else {
-							$img = "/wordpress/wp-content/default/default.png";
-						}
-						echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
+						//if ($user_image) {
+						//	$img = "/wordpress".$user_image;
+						//} else {
+						//	$img = "/wordpress/wp-content/default/default.png";
+						//}
+						//echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
 					?>
 					<?php echo "Email: $user_email<br />" ?>
-					<?php if ($user_website) echo "Website: $user_website<br />" ?>
-					<?php if ($user_bio) echo "Bio: $user_bio<br />" ?>
+					<?php if ($user_website) echo "Website: $user_website<br /><br />" ?>
+					<?php if ($user_bio) echo "<h3>About Me</h3> <div class=\"bio\">$user_bio</div><br />" ?>
 
 				</main>
 			</div>

@@ -79,7 +79,7 @@
 	*/
 
 	$url ='http://localhost/wordpress/projinfo/?view='.$proj_title;
-	display("Your project was successfully processed. <br> Redirecting to project page...");
+	display("Your project was successfully processed. <br> Redirecting to project page in 5 seconds...");
 	redirect($url);
 
 	function fileupload(){
@@ -139,11 +139,11 @@
 		       display("Sorry, there is an error uploading your file.");
 			   fileerror();  
 		    }
-		} 
+		}
 	}
 
 	function fileerror(){
-		display("Redirecting to previous page...");
+		display("Redirecting to previous page in 5 seconds...");
 		$url = "{$_SERVER['HTTP_REFERER']}";
 		redirect($url);
 	}
@@ -151,7 +151,7 @@
 	//redirect($url);
 	function redirect($url){
 		$string = '<script type="text/javascript">';
-	    $string .= 'window.location = "' . $url . '"';
+	    $string .= 'setTimeout(function(){window.location = "' . $url . '";}, 5000);';
 	    $string .= '</script>';
 	    echo $string;
 	    die();

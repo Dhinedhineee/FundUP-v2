@@ -7,6 +7,11 @@
 ?>
 
 <?php
+	if(!IsSet($_SERVER['HTTP_REFERER'])){
+		header('Location: http://localhost/wordpress');
+		die();
+	}
+
 	$current_user = wp_get_current_user();
 	$user_ID = $current_user->ID;
 
@@ -16,7 +21,7 @@
 
 	$user_name = $info['display_name'];
 	$user_bio = $info2['meta_value'];
-	$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
+	//$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
 
 	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user='$user_name'", ARRAY_A);
 	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user='$user_name'", ARRAY_A);
@@ -38,22 +43,23 @@
 
 					<?php echo '<h1 class="name">Welcome back, '.$user_name.'!</h1>' ?>
 					<?php
-						if ($user_image) {
-							$img = "/wordpress".$user_image;
-						} else {
-							$img = "/wordpress/wp-content/default/default.png";
-						}
-						echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
+						//if ($user_image) {
+						//	$img = "/wordpress".$user_image;
+						//} else {
+						//	$img = "/wordpress/wp-content/default/default.png";
+						//}
+						//echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
 					?>
 					<?php echo '<a href="http://localhost/wordpress/user-profile/?view='.$user_ID.'">View Profile</a><br />' ?>
 					<a href="http://localhost/wordpress/edit-profile">Edit Profile</a><br />
-					<a href="http://localhost/wordpress/change-profile-picture">Change Profile Picture</a><br/ >
+					<!-- <a href="http://localhost/wordpress/change-profile-picture">Change Profile Picture</a><br/ > -->
+					<br />
 					<h2 class="label">My Projects</h2>
 					<?php
 						if ($projects) {
 							echo '<table class="projects">';
 							foreach ($projects as $project) {
-								echo '<tr><td class="title">[edit link] <a href="http://localhost/wordpress/projinfo/?view='.$project['proj_title'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/edit-project/?edit='.$project['proj_title'].'">[edit]</a> <a href="http://localhost/wordpress/projinfo/?view='.$project['proj_title'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
 							}
 							echo '</table>';
 						} else {
