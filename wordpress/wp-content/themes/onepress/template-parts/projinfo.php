@@ -24,7 +24,7 @@
 			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 			$proj_image = $result['proj_image'];
 			$proj_info = $result['proj_info'];
-			$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name='$proj_user'");
+			$user_ID = $result['proj_user_ID'];
 		}
 	$proj_info = str_replace("\n", "<br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
 
@@ -42,7 +42,7 @@
 			<?php 	
 				if(IsSet($proj_title))	echo "<p><h2>$proj_title</h2></p>";
 				else 					echo "<h2>Project name not found</h2>";
-				if(IsSet($proj_user))	echo "<p><h4>by <a href='http://localhost/wordpress/user-profile/?view=$user_id' style='color:#7b1113;' >$proj_user</a></h4></p>";
+				if(IsSet($proj_user))	echo "<p><h4>by <a href='http://localhost/wordpress/user-profile/?view=$user_ID' style='color:#7b1113;' >$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
 					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user."/".$proj_image;
@@ -80,7 +80,7 @@
 						</p>";
 				} else {
 					$current_user = wp_get_current_user();
-					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user='$current_user->display_name'";
+					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user_ID='$current_user->ID'";
 					$user_donate = $wpdb->get_var($query);
 						
 					if(!IsSet($user_donate)) 	$user_donate = 0;
@@ -139,8 +139,9 @@
 									if($list['anon'] == 1)	echo "Anonymous";
 									else{
 										$pledger = $list['user'];	
-										$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name='$pledger'");
-										echo "<a href='http://localhost/wordpress/user-profile/?view=$user_id'>$pledger</a>";	
+										#$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name='$pledger'");
+										$user_ID = $list['user_ID'];	
+										echo "<a href='http://localhost/wordpress/user-profile/?view=$user_ID'>$pledger</a>";	
 									}
 								echo '</div>';
 								echo '<div id="pledgedate">';
