@@ -19,11 +19,13 @@
 	$url = 'http://localhost/wordpress';
 		if(!isset($result)) 					redirect($url);
 		else {
-				$proj_user = $result['proj_user'];
+				$proj_user_ID = $result['proj_user_ID'];
+				$proj_user = wp_get_current_user()->display_name;
                 $current_user = wp_get_current_user();
-                $name = $current_user->display_name;
+                $curr_user_ID = $current_user->ID;
                 
-                if($proj_user != $name)			redirect($url);
+                #if($proj_user != $name)			redirect($url);
+                if($proj_user_ID != $curr_user_ID)			redirect($url);
 
 				#HEADER SETUP
 				get_header();
@@ -141,10 +143,7 @@
 </div><!-- .entry-content -->
 </article><!-- #post-## -->
 
-					
 				</main><!-- #main -->
-
-            
 		</div><!--#content-inside -->
 	</div><!-- #content -->
 

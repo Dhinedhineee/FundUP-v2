@@ -1,3 +1,5 @@
+
+
 <?php
 	/*Template Name: Edit Project Processing Template*/
 	/**
@@ -9,13 +11,20 @@
 	get_header();
 	$layout = onepress_get_layout();
 	echo onepress_breadcrumb();
-	echo "<br><br><br>";	
+	echo "<br><br><br>";
+
 ?>
 
 <div id="content" class="site-content">
-		<div class="page-header">
-			<div class="container">
-
+	<div class="page-header">
+		<div class="container">
+			<h1 class="entry-title">Edit A Project</h1>
+		</div><!-- container -->
+	</div><!-- page-header -->
+	<div class="container">
+		<div id="primary" class="content-area">
+			<main id="main" class="site-main" role="main">
+	
 <?php 
 
 	if(!IsSet($_SERVER['HTTP_REFERER']) || !IsSet($_POST['proj-name'])){
@@ -79,7 +88,7 @@
 	*/
 
 	$url ='http://localhost/wordpress/projinfo/?view='.$proj_title;
-	display("Your project was successfully processed. <br> Redirecting to project page in 5 seconds...");
+	display("Your project was successfully processed. <br> Redirecting to project page...");
 	redirect($url);
 
 	function fileupload(){
@@ -143,7 +152,7 @@
 	}
 
 	function fileerror(){
-		display("Redirecting to previous page in 5 seconds...");
+		display("Redirecting to previous page...");
 		$url = "{$_SERVER['HTTP_REFERER']}";
 		redirect($url);
 	}
@@ -158,11 +167,16 @@
 	}
 
 	function display($msg){	
-		echo "<h1>".$msg."</h1>";
+		echo "<h2>".$msg."</h2>";
 	}
 ?>
+			</main><!-- #main -->
+		</div><!-- #primary -->
+	</div><!-- #container -->
+</div><!-- #content -->
 
-</div></div></div>
+
+<!-- #footer is not sent because of automatic redirection -->
 <footer style="clear:both;display: block">
 	<?php get_footer();?>
 </footer>
