@@ -27,11 +27,13 @@
 		
 		$current_user = wp_get_current_user();
 		$pledger = $current_user->display_name;
+		$pledger_ID = $current_user->ID;
 		if(isset($_POST['Anonymous']) && $_POST['Anonymous'] == 'Yes') $anon = 1;
 		else 	$anon = NULL;
       	$wpdb->insert('user_actions', 
       			array(
       					'user' => $pledger,
+      					'user_ID' => $pledger_ID,
       					'anon' => $anon,
       					'proj_title' => $proj_title,
       					'fund_given' => $pledge_amount,
