@@ -14,3 +14,35 @@
 	width: 85%;
 	text-align: left;
 }
+
+.projects {
+	width: 95%;
+	margin: auto;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+.title {
+	width: 37%;
+	border-top: 0px;
+	border-bottom: 1px solid #e9e9e9;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+.money {
+	width: 25%;
+	border-top: 0px;
+	border-bottom: 1px solid #e9e9e9;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+.goal {
+	border-top: 0px;
+	border-bottom: 1px solid #e9e9e9;
+	border-left: 0px;
+	border-right: 0px;
+}

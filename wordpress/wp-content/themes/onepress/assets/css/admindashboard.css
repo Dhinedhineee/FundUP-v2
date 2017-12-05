@@ -1,0 +1,57 @@
+.display {
+	width: 95%;
+	margin: auto;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+.name {
+	border-top: 0px;
+	border-bottom: 1px solid #e9e9e9;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+.options {
+	border-top: 0px;
+	border-bottom: 1px solid #e9e9e9;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+input[type="submit"] {
+  cursor: pointer;
+  background: #fff;
+  color: #820000;
+  border: none;
+  display: inline-block;
+  letter-spacing: 1px;
+  text-transform: none;
+  line-height: 1;
+  text-align: center;
+  padding: 0px 0px 0px 0px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  box-shadow: none;
+  margin: 3px 0;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+input[type="submit"]:hover {
+  color: #777777;
+}
+
+td a {
+	letter-spacing: 1px;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+td a:hover {
+	text-decoration: none;
+}

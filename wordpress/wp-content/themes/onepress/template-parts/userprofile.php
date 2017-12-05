@@ -24,6 +24,7 @@
 		$user_email = $info['user_email'];
 		$user_website = $info['user_url'];
 		$user_bio = $info2['meta_value'];
+		$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user='$user_name'", ARRAY_A);
 		//$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
 	}
 
@@ -55,6 +56,19 @@
 					<?php if ($user_website) echo "Website: $user_website<br /><br />" ?>
 					<?php if ($user_bio) echo "<h3>About Me</h3> <div class=\"bio\">$user_bio</div><br />" ?>
 
+					<h3 class="label">Projects</h2>
+					<?php
+						if ($projects) {
+							echo '<table class="projects">';
+							foreach ($projects as $project) {
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_title'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
+							}
+							echo '</table>';
+						} else {
+							echo "No projects yet.<br />";
+						}
+					?>
+					
 				</main>
 			</div>
 
