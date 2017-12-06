@@ -19,7 +19,9 @@
 			die();
 			header('Location: http://localhost/wordpress');die();
 		} else {
+			$proj_id = $result['proj_id'];
 			$proj_user = $result['proj_user'];
+			$proj_user_ID = $result['proj_user_ID'];
 			$proj_goal = $result['proj_goal'];
 			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 			$proj_image = $result['proj_image'];
@@ -45,7 +47,7 @@
 				if(IsSet($proj_user))	echo "<p><h4>by <a href='http://localhost/wordpress/user-profile/?view=$user_ID' style='color:#7b1113;' >$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
-					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user."/".$proj_image;
+					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 					echo '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" >';
 				}
 				else 					echo '<img src ="#" alt="No image available for this project." id=\"contentimg\" >';
@@ -80,13 +82,14 @@
 						</p>";
 				} else {
 					$current_user = wp_get_current_user();
-					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user_ID='$current_user->ID'";
+					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_id' AND user_ID='$current_user->ID'";
 					$user_donate = $wpdb->get_var($query);
 						
 					if(!IsSet($user_donate)) 	$user_donate = 0;
 					echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P$user_donate in the project!</p>";
 					if($user_donate > 0)	echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO DONATE AGAIN?</strong></p>";	
 					echo "<form action='pledge-processing' method='post'>
+								<input type='hidden' name='proj_ID' value='$proj_id'>
 								<input type='hidden' name='proj_title' value='$proj_title'>
 						        <label for='pledge'><strong>PLEDGE AMOUNT:</strong></label>
 						        <input type='number' id='pledge' name='pledge_amount' min='1' style='width:100%;' required>
@@ -109,7 +112,7 @@
 				<br><h5>PLEDGERS' LIST</h5>
 				<ul><?php
 						$pledgecount = 0;
-						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
+						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id';", ARRAY_A);
 						if(IsSet($result))
 							foreach ($result as $list) {
 								$pledgecount++;
@@ -126,7 +129,6 @@
 		<div id="projcomments">
 			<hr><p style="color: #7b1113;">PLEDGERS' COMMENTS</p>
 			<?php
-				$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
 				$commentcount = 0;
 				if(IsSet($result)){
 					foreach ($result as $list) {

@@ -44,7 +44,7 @@
 	$proj_fund = $result['proj_fund'];
 	$fundtext = "The project's current fund pledged is P".number_format($proj_fund)."";
 	$proj_image = $result['proj_image'];
-	$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user."/".$proj_image;
+	$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 	$imagetext = '<br><img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br><br>';
 	//echo ini_get('post_max_size');
 ?>

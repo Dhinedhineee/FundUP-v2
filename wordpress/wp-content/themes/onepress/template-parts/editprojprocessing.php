@@ -95,11 +95,12 @@
 		global $current_user_name;
 		$current_user = wp_get_current_user();
 		$current_user_name = $current_user->display_name;
+		$current_user_ID = $current_user->ID;
 		$upload_dir = wp_upload_dir();
 	    $users_folder_dir = $upload_dir['basedir'].'/users';
 	       
 	    if (isset($current_user_name) && !empty($users_folder_dir)){
-	        $user_dirname = $users_folder_dir.'/'.$current_user_name.'/';
+	        $user_dirname = $users_folder_dir.'/'.$current_user_ID.'/';
 	        if (!file_exists($user_dirname))	wp_mkdir_p($user_dirname);
 			$target_file = $user_dirname . basename($_FILES["proj-image"]["name"]);
 	    }

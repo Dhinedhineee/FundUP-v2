@@ -30,8 +30,8 @@
 			<div id="primary" class="content-area">
 				<main id="main" class="site-main" role="main">
 
-					<?php echo do_shortcode('[contact-form-7 id="297" title="Create Project"]'); ?>
-
+					<?php echo do_shortcode('[contact-form-7 id="297" title="Create Project"]'); ?>	
+					
 				</main><!-- #main -->
 			</div><!-- #primary -->
 

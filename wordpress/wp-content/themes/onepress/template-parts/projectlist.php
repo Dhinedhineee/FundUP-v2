@@ -48,7 +48,7 @@
 						    %s <br> by %s
 						    </a>
 						    <p style=\"overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;\">%s</p>
-						    </div>", $row["proj_title"],$row["proj_user"],$row["proj_image"],$row["proj_title"],$row["proj_user"],$row["proj_info"]);
+						    </div>", $row["proj_title"],$row["proj_user_ID"],$row["proj_image"],$row["proj_title"],$row["proj_user"],$row["proj_info"]);
 						    }
 
 						    /* free result set */
