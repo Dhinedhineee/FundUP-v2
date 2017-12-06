@@ -41,11 +41,25 @@
 	    die();
 	}
 
+	
+	$proj_deadline = $result['proj_deadline'];
+
+	if(isset($proj_deadline)){
+		$funddate = "This project's current deadline is on ".$result['proj_deadline']."";
+		$mindate = $result['proj_deadline'];
+	}
+	else{
+		$funddate = "This project's deadline has not been set.";
+		date_default_timezone_set('Asia/Manila');
+		$mindate = date('Y-m-d');
+	}
+	
 	$proj_fund = $result['proj_fund'];
-	$fundtext = "The project's current fund pledged is P".number_format($proj_fund)."";
+	$fundtext = "This project's current fund pledged is P".number_format($proj_fund)."";
 	$proj_image = $result['proj_image'];
 	$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 	$imagetext = '<br><img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br><br>';
+
 	//echo ini_get('post_max_size');
 ?>
 
@@ -75,6 +89,8 @@
 		<span id="titlealert"></span></span> </label></p>
 		<p><label> Goal Amount<br />
 		<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.do_shortcode("[CF7_PROJ_GOAL key='edit']").'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1"/></span></label><span>'.$fundtext.'</span></p>
+		<p><label> Project Deadline<br />
+		<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
 		<p><label> Project Information<br />
 		<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
 		<span id="infoalert"></span></span> </label></p>

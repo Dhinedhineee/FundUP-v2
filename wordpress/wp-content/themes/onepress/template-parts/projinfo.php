@@ -23,10 +23,12 @@
 			$proj_user = $result['proj_user'];
 			$proj_user_ID = $result['proj_user_ID'];
 			$proj_goal = $result['proj_goal'];
+			$proj_deadline = $result['proj_deadline'];
 			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 			$proj_image = $result['proj_image'];
 			$proj_info = $result['proj_info'];
 			$user_ID = $result['proj_user_ID'];
+			$proj_finished = 1;
 		}
 	$proj_info = str_replace("\n", "<br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
 
@@ -69,12 +71,44 @@
 					echo "<span>P</span>";
 					echo "<span style='float:right; letter-spacing:2px;  overflow-wrap:break-word;'>".number_format($proj_fund)."</span>";
 				?>
-			</div><br><br>
+				<?php 
+					if(isset($proj_deadline)){
+						date_default_timezone_set('Asia/Manila');
+						$hey = new DateTime($proj_deadline);
+						$localtime = new DateTime();
+						$localtime->add(DateInterval::createFromDateString('yesterday'));
+						$et = $hey->diff($localtime);
+						$deadline = $et->format('%R%a')*-1;
+						if($et->invert == 1){
+							echo "<br><br><hr><p style='text-align: center; color:#7b1113;'><b>This project will end ";
+							if($deadline == 0)	echo "today";
+							else{
+								echo "in ".($deadline)." day";
+								if ($deadline > 1) echo "s";
+							}
+							$proj_finished = 0;
+						}
+						else {
+							echo "<br><br><hr><p style='text-align: center; color:#7b1113;'><b>This project has ended ";
+							if ($deadline == 0)			echo "1 day ago";
+							else 						echo (($deadline-1)*-1). " days ago"; 							
+						}
+					}else {
+						echo "<br><br><hr><p style='text-align: center; color:#7b1113;'><b>Project deadline is not set</b>";
+					}
+					echo ".</b></p>";
+				?>
+			</div>
+			
+			<br>
 			<div id="asidedonor">
 				<div id="donatewidget">
-				<hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>
+				<?php 
+					if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
+				?>
 				<?php
-				if (!is_user_logged_in() ){
+				if ($proj_finished){}
+				else if (!is_user_logged_in() ){
 					echo "<p style='text-transform:none; text-align:center; color:black;'>
 						You need to be a registered user to donate. Click here to 
 						<a href='http://localhost/wordpress/signup/'><strong>register</strong></a> or 
@@ -166,7 +200,11 @@
 						}
 					}				
 				}	
-				if(!$commentcount)	echo "<p style='padding-left:20px;'>No comments yet. Please pledge first to be able to leave comments!</p>";
+				if(!$commentcount){
+					echo "<p style='padding-left:20px;'>";
+					if ($proj_finished) 	echo "This project has no comments.</p>";
+					else   					echo "No comments yet. Please pledge first to be able to leave comments!</p>";
+				}	
 				echo '<hr>';
 			?>
 		</div>	

@@ -450,6 +450,7 @@ function save_form( $wpcf7 ) {
                 'proj_user_ID' => $current_user_ID,
                 'proj_user' => $current_user_name,
                 'proj_goal' => $submitted['posted_data']['goal-amount'],
+                'proj_deadline' => $submitted['posted_data']['proj-deadline'],
                 'proj_fund' => $init_goal,
                 'proj_image' => $submitted['image'],
                 'proj_info' => $submitted['posted_data']['proj-info'],

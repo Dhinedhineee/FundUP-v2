@@ -32,7 +32,7 @@
 		header('Location: http://localhost/wordpress');
 		die();
 	}
-
+	$proj_deadline = htmlspecialchars($_POST['proj-deadline']);
 	$proj_title = htmlspecialchars($_POST['proj-name']);
 	$proj_goal = htmlspecialchars($_POST['goal-amount']);
 	$proj_info = htmlspecialchars($_POST['proj-info']);
@@ -54,6 +54,7 @@
 		'projects', 
 		array( 
 			'proj_goal' => $proj_goal,
+			'proj_deadline' => $proj_deadline,
 			'proj_info' => $proj_info,
 			'proj_image' => $proj_image
 		), 
