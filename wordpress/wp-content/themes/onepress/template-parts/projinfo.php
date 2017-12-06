@@ -19,12 +19,16 @@
 			die();
 			header('Location: http://localhost/wordpress');die();
 		} else {
+			$proj_id = $result['proj_id'];
 			$proj_user = $result['proj_user'];
+			$proj_user_ID = $result['proj_user_ID'];
 			$proj_goal = $result['proj_goal'];
+			$proj_deadline = $result['proj_deadline'];
 			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 			$proj_image = $result['proj_image'];
 			$proj_info = $result['proj_info'];
 			$user_ID = $result['proj_user_ID'];
+			$proj_finished = 1;
 		}
 	$proj_info = str_replace("\n", "<br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
 
@@ -45,7 +49,7 @@
 				if(IsSet($proj_user))	echo "<p><h4>by <a href='http://localhost/wordpress/user-profile/?view=$user_ID' style='color:#7b1113;' >$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
-					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user."/".$proj_image;
+					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 					echo '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" >';
 				}
 				else 					echo '<img src ="#" alt="No image available for this project." id=\"contentimg\" >';
@@ -67,12 +71,44 @@
 					echo "<span>P</span>";
 					echo "<span style='float:right; letter-spacing:2px;  overflow-wrap:break-word;'>".number_format($proj_fund)."</span>";
 				?>
-			</div><br><br>
+				<?php 
+					if(isset($proj_deadline)){
+						date_default_timezone_set('Asia/Manila');
+						$hey = new DateTime($proj_deadline);
+						$localtime = new DateTime();
+						$localtime->add(DateInterval::createFromDateString('yesterday'));
+						$et = $hey->diff($localtime);
+						$deadline = $et->format('%R%a')*-1;
+						if($et->invert == 1){
+							echo "<br><br><hr><p style='text-align: center; color:#7b1113;'><b>This project will end ";
+							if($deadline == 0)	echo "today";
+							else{
+								echo "in ".($deadline)." day";
+								if ($deadline > 1) echo "s";
+							}
+							$proj_finished = 0;
+						}
+						else {
+							echo "<br><br><hr><p style='text-align: center; color:#7b1113;'><b>This project has ended ";
+							if ($deadline == 0)			echo "1 day ago";
+							else 						echo (($deadline-1)*-1). " days ago"; 							
+						}
+					}else {
+						echo "<br><br><hr><p style='text-align: center; color:#7b1113;'><b>Project deadline is not set</b>";
+					}
+					echo ".</b></p>";
+				?>
+			</div>
+			
+			<br>
 			<div id="asidedonor">
 				<div id="donatewidget">
-				<hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>
+				<?php 
+					if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
+				?>
 				<?php
-				if (!is_user_logged_in() ){
+				if ($proj_finished){}
+				else if (!is_user_logged_in() ){
 					echo "<p style='text-transform:none; text-align:center; color:black;'>
 						You need to be a registered user to donate. Click here to 
 						<a href='http://localhost/wordpress/signup/'><strong>register</strong></a> or 
@@ -80,13 +116,14 @@
 						</p>";
 				} else {
 					$current_user = wp_get_current_user();
-					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title' AND user_ID='$current_user->ID'";
+					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_id' AND user_ID='$current_user->ID'";
 					$user_donate = $wpdb->get_var($query);
 						
 					if(!IsSet($user_donate)) 	$user_donate = 0;
 					echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P$user_donate in the project!</p>";
 					if($user_donate > 0)	echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO DONATE AGAIN?</strong></p>";	
 					echo "<form action='pledge-processing' method='post'>
+								<input type='hidden' name='proj_ID' value='$proj_id'>
 								<input type='hidden' name='proj_title' value='$proj_title'>
 						        <label for='pledge'><strong>PLEDGE AMOUNT:</strong></label>
 						        <input type='number' id='pledge' name='pledge_amount' min='1' style='width:100%;' required>
@@ -109,7 +146,7 @@
 				<br><h5>PLEDGERS' LIST</h5>
 				<ul><?php
 						$pledgecount = 0;
-						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
+						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id';", ARRAY_A);
 						if(IsSet($result))
 							foreach ($result as $list) {
 								$pledgecount++;
@@ -126,7 +163,6 @@
 		<div id="projcomments">
 			<hr><p style="color: #7b1113;">PLEDGERS' COMMENTS</p>
 			<?php
-				$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
 				$commentcount = 0;
 				if(IsSet($result)){
 					foreach ($result as $list) {
@@ -164,7 +200,11 @@
 						}
 					}				
 				}	
-				if(!$commentcount)	echo "<p style='padding-left:20px;'>No comments yet. Please pledge first to be able to leave comments!</p>";
+				if(!$commentcount){
+					echo "<p style='padding-left:20px;'>";
+					if ($proj_finished) 	echo "This project has no comments.</p>";
+					else   					echo "No comments yet. Please pledge first to be able to leave comments!</p>";
+				}	
 				echo '<hr>';
 			?>
 		</div>	
