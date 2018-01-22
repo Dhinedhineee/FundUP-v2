@@ -1,5 +1,5 @@
 <?php
-/** Template Name: Start a Project 2*/
+/** Template Name: Start a Project*/
 /**
  * @link https://codex.wordpress.org/Template_Hierarchy
  * @package OnePress
@@ -21,7 +21,7 @@
 <div id="content" class="site-content">
 	<div class="page-header">
 		<div class="container">
-			<h1 class="entry-title">Start a Project 2</h1>			
+			<h1 class="entry-title">Start a Project</h1>			
 		</div>
 	</div>
 
@@ -47,17 +47,16 @@
 	?>
 
 	<p><label> Project Information<br>
-	<textarea name="proj-info" id="proj-info" cols="40" rows="10"></textarea>
+	<textarea name="proj-info" id="proj-info" cols="40" rows="10" required></textarea>
 	<span id="infoalert"></span></label></p>
 	
-	<p><label>Project Tiers<br>
-		<div id="tierstiers">
+	<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
+		<Span id="tierstiers">
 			<table id="tierstable" style="width:auto;"></table>		
-		</div><span id="tieralert"></span></span> 
+		</span><span id="tieralert"></span></label>
 	</label></p>
 
-	<p><label> Project Photo
-	<p><label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
+	<p><label> Project Photo<label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)" required/><br><span id="FileError"></span></span></label>	
 	</label></p>
 				
 	<p><input type="submit" id="submitbtn" value="Submit"/></p>
@@ -82,9 +81,14 @@
 
 	function addingtiers(){
 		if(tier < limit){
-			var newtier = document.getElementById('tierstable').insertRow(tier);
+			var newtier;
+			if(tier == 0){
+				newtier = document.getElementById('tierstable').insertRow(tier);
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Description</th><th></th>"
+			}
+			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
-			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1"></textarea>';
+			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
 			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
 			tier++;
@@ -97,6 +101,12 @@
 		a.parentNode.removeChild(a);
 		tier--;	
 		if(tier==4)		addtierbutton();
+		if(tier==0)		removetierheader(removetier);
+	}
+
+	function removetierheader(){
+		a = document.getElementById('tierstable').childNodes[0];
+		document.getElementById('tierstable').removeChild(a);
 	}
 
 	function submitted(){
@@ -134,7 +144,7 @@
 	        }
 	        else if (oFile.type == "image/jpeg"||oFile.type == "image/gif"||oFile.type == "image/png"||oFile.type == "image/pjpeg"){
 	        	document.getElementById("FileError").innerHTML = "";	
-	        	alert("CORRECT FILE");
+	        	//alert("CORRECT FILE");
 	        }
 	        else {
 	        	document.getElementById("FileError").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">FILE SUBMISSION SHOULD ONLY BE OF TYPE JPG/JPEG/GIF/PNG.</span>';

@@ -82,8 +82,8 @@
 
 	$wpdb->delete('proj_tiers', array( 'proj_ID' => $proj_ID ));
 	if(IsSet($_POST['proj-tier']['AMOUNT'])){
-		var_dump($_POST['proj-tier']['TEXT']);
-		var_dump($_POST['proj-tier']['AMOUNT']);
+		//var_dump($_POST['proj-tier']['TEXT']);
+		//var_dump($_POST['proj-tier']['AMOUNT']);
 	
 		for ($i = 0; $i < sizeof($_POST['proj-tier']['AMOUNT']); $i++){
 			$proj_tier_desc = htmlspecialchars($_POST['proj-tier']['TEXT'][$i]);
@@ -152,12 +152,11 @@
 		}
 
 		// Allow certain file formats
-		if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-		&& $imageFileType != "gif" ) {
-		    display("Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
+		if($imageFileType != "JPG" && $imageFileType != "jpg" && $imageFileType != "PNG" && $imageFileType != "png" && $imageFileType != "JPEG" && $imageFileType != "jpeg"
+		&& $imageFileType != "GIF" && $imageFileType != "gif" && $uploadOk != 0) {
+		    display("The project photo is of type ".$imageFileType.". Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
 		    $uploadOk = 0;
 		}
-		
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk == 0) {
 		    display("Sorry, there is an error uploading your file.");

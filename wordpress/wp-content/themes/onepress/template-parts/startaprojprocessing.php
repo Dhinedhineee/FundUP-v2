@@ -45,14 +45,10 @@
 	$proj_user_ID = $current_user->ID;
 	$proj_goal = htmlspecialchars($_POST['goal-amount']);
 	$proj_deadline = htmlspecialchars($_POST['proj-deadline']);
-	###image here
-	#need to save the pic in the folder----better not to save it first in the databsase
 	$proj_info = htmlspecialchars($_POST['proj-info']);
-	var_dump($_FILES['proj-image']);
-	//if($_FILES['proj-image']['size'] != 0){
-		fileupload();
-		$proj_image = $_FILES['proj-image']['name'];
-	//}
+	//var_dump($_FILES['proj-image']);
+	fileupload();
+	$proj_image = $_FILES['proj-image']['name'];
 
 	$wpdb->insert(
 		'projects', 
@@ -132,9 +128,9 @@
 		}
 
 		// Allow certain file formats
-		if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-		&& $imageFileType != "gif" ) {
-		    display("Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
+		if($imageFileType != "JPG" && $imageFileType != "jpg" && $imageFileType != "PNG" && $imageFileType != "png" && $imageFileType != "JPEG" && $imageFileType != "jpeg"
+		&& $imageFileType != "GIF" && $imageFileType != "gif" && $uploadOk != 0) {
+		    display("The project photo is of type ".$imageFileType.". Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
 		    $uploadOk = 0;
 		}
 		
@@ -155,11 +151,10 @@
 	}
 
 	function fileerror(){
-		echo "FILE ERROR";
+		display("Redirecting to previous page...");
+		$url = "{$_SERVER['HTTP_REFERER']}";
 		die();
-		//display("Redirecting to previous page...");
-		//$url = "{$_SERVER['HTTP_REFERER']}";
-		//redirect($url);
+		redirect($url);
 	}
 
 
@@ -184,22 +179,6 @@
 	redirect($url);
 
 	#################END OF REDIRECTION HERE########################
-	
-	
-	/*
-	if(!IsSet($_SERVER['HTTP_REFERER']) || !IsSet($_POST['proj-name'])){
-		//Unknown site access
-		header('Location: http://localhost/wordpress');
-		die();
-	}
-	$proj_deadline = htmlspecialchars($_POST['proj-deadline']);
-	$proj_title = htmlspecialchars($_POST['proj-name']);
-	$proj_goal = htmlspecialchars($_POST['goal-amount']);
-	$proj_info = htmlspecialchars($_POST['proj-info']);
-	$origprojname = htmlspecialchars($_POST['origprojname']);
-
-	*/
-
 ?>
 
 </main><!-- #main -->

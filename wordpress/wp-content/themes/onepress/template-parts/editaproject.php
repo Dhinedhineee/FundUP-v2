@@ -39,13 +39,12 @@
 	$proj_deadline = $result['proj_deadline'];
 
 	if(isset($proj_deadline)){
-		$funddate = "This project's current deadline is on ".$result['proj_deadline']."";
 		$mindate = $result['proj_deadline'];
+		$funddate = "This project's current deadline is on ".date('m-d-Y',strtotime($mindate))."";
 	}
 	else{
 		$funddate = "This project's deadline has not been set.";
 		date_default_timezone_set('Asia/Manila');
-		$mindate = date('Y-m-d');
 	}
 	$proj_ID = $result['proj_id'];
 	$proj_fund = $result['proj_fund'];
@@ -91,22 +90,21 @@
 				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.do_shortcode("[CF7_PROJ_GOAL key='edit']").'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1" required/></span></label><span>'.$fundtext.'</span></p>
 		
 		<p><label> Project Deadline<br />
-					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
+					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$mindate.'" min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
 
 		<p><label> Project Information<br />
 				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
 				<span id="infoalert"></span></span> </label></p>
-		
-		<p><label>Project Tiers<br>
-			<div id="tierstiers">
-				<table id="tierstable" style="width:auto;">'.$projtiers.'</table>
-				
-			</div><span id="tieralert"></span></span> 
+	
+		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
+		<span id="tierstiers">
+			<table id="tierstable" style="width:auto;">'.$projtiers.'</table>		
+		</span><span id="tieralert"></span></label>
 		</label></p>
 		
-		<p><label> Project Photo
+		<p><label> Current Project Photo
 		<span id="imageshow">'.$imagetext.'</span>
-		<p><label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40"  class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)" required/><br><span id="FileError"></span></span></label></p>
+		<p><label> Upload a new project photo(jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40"  class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
 		<span id="imgcontainer2"></span>
 		
 		<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-form-control wpcf7-submit" /></p>
@@ -135,9 +133,14 @@
 
 	function addingtiers(){
 		if(tier < limit){
-			var newtier = document.getElementById('tierstable').insertRow(tier);
+			var newtier;
+			if(tier == 0){
+				newtier = document.getElementById('tierstable').insertRow(tier);
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Description</th><th></th>"
+			}
+			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
-			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1"></textarea>';
+			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
 			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
 			tier++;
@@ -150,6 +153,12 @@
 		a.parentNode.removeChild(a);
 		tier--;	
 		if(tier==4)		addtierbutton();
+		if(tier==0)		removetierheader(removetier);
+	}
+
+	function removetierheader(){
+		a = document.getElementById('tierstable').childNodes[0];
+		document.getElementById('tierstable').removeChild(a);
 	}
 
 	function verifyMe(){
