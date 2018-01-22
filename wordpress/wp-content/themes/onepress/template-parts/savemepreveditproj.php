@@ -7,12 +7,15 @@
 	if (isset($_GET['edit']))		
 		$proj_title = htmlspecialchars($_GET['edit']);
 	else $proj_title = NULL;
+
+	
 ?>
 
 <?php 
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_title='$proj_title'";
 	$result = $wpdb->get_row($query, ARRAY_A);
+	//var_dump($result);		#for debugging
 	$url = 'http://localhost/wordpress';
 		if(!isset($result)) 					redirect($url);
 		else {
@@ -20,7 +23,10 @@
 				$proj_user = wp_get_current_user()->display_name;
                 $current_user = wp_get_current_user();
                 $curr_user_ID = $current_user->ID;
+                
+                #if($proj_user != $name)			redirect($url);
                 if($proj_user_ID != $curr_user_ID)			redirect($url);
+
 				#HEADER SETUP
 				get_header();
 				$layout = onepress_get_layout();
@@ -53,92 +59,95 @@
 	$proj_image = $result['proj_image'];
 	$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 	$imagetext = '<br><img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br><br>';
+
+	//echo ini_get('post_max_size');
 ?>
 
 	<div id="content" class="site-content">
 		<div class="page-header">
 			<div class="container">
-				<h1 class="entry-title">Edit A Project</h1>			
-			</div>
+				<h1 class="entry-title">Edit A Project</h1>			</div>
 		</div>
 
+		
 		<div id="content-inside" class="container no-sidebar">
+			
 				<main id="main" class="site-main" role="main">
-					<div class="entry-content"></div>
+
+		<article id="post-338" class="post-338 page type-page status-publish hentry">
+	<header class="entry-header">
+			</header><!-- .entry-header -->
+
+	<div class="entry-content">
+
+</div>
 
 <?php 
 	global $wpdb;
 	$result = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id='$proj_ID';", ARRAY_A);
 	if(isset($result)){
+
 		$projtiers = '';
+		var_dump($result);
 		foreach ($result as $tier) {
-			$projtiers = $projtiers.'<tr>
-			<td><input type="number" name="proj-tier[AMOUNT][]" value="'.$tier['proj_tier_amount'].'" required min="1"/></td>
-			<td><textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1">'.stripcslashes($tier['proj_tier_desc']).'</textarea></td>
-			<td><a href="javascript:void(0);" onclick="remove(this)" id="remtier">Remove Tier</a></td>
+			$projtiers = $projtiers.'<tr><td>
+			<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="proj-tier[AMOUNT][]" value="'.$tier['proj_tier_amount'].'"class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1"/></span>
+			</td><td>
+			<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" aria-invalid="false">'.stripcslashes($tier['proj_tier_desc']).'</textarea></span>
+			</td><td>
+			<span><a href="javascript:void(0);" onclick="remove(this)" id="remtier">Remove Tears</a></span>
+			</td>
 			</tr>';
 		}
 	}
 
 	echo'
-		<form action="edit-project-processing" method="post" class="wpcf7-form demo" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
-		
+		<form action="edit-project-processing" method="post" class="wpcf7-form" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
 		<p><label> Project Name<br />
-		    	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" value="'.$proj_title.'" aria-invalid="false" id="proj-name" required/>
-				<span id="titlealert"></span></span> </label></p>
-
+    	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name" value="'.$proj_title.'" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" aria-invalid="false" id="proj-name"/>
+		<span id="titlealert"></span></span> </label></p>
 		<p><label> Goal Amount<br />
-				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.do_shortcode("[CF7_PROJ_GOAL key='edit']").'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1" required/></span></label><span>'.$fundtext.'</span></p>
-		
+		<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.do_shortcode("[CF7_PROJ_GOAL key='edit']").'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1"/></span></label><span>'.$fundtext.'</span></p>
 		<p><label> Project Deadline<br />
-					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
-
+		<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
 		<p><label> Project Information<br />
-				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
-				<span id="infoalert"></span></span> </label></p>
-		
-		<p><label>Project Tiers<br>
-			<div id="tierstiers">
-				<table id="tierstable" style="width:auto;">'.$projtiers.'</table>
-				
-			</div><span id="tieralert"></span></span> 
-		</label></p>
-		
+		<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
+		<span id="infoalert"></span></span> </label></p>
+		<p><label> Project Tiers<br />
+		<div id="tierstiers">
+		<table id="tierstable">'.$projtiers.'</table>
+		<a href="javascript:void(0)" id="addtiers">+ try to add me </a>
+		</div>
+		<span id="tieralert"></span></span> </label></p>
 		<p><label> Project Photo
 		<span id="imageshow">'.$imagetext.'</span>
-		<p><label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40"  class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)" required/><br><span id="FileError"></span></span></label></p>
+		<p><label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br /><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
 		<span id="imgcontainer2"></span>
-		
+		</label></p>
 		<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-form-control wpcf7-submit" /></p>
 		<input type="hidden" name="origprojname" value="'.$proj_title.'" />
 		<div id="submitted"></div>
-		</form><br>
+		</form>
+		<br>
 	';
+
+	
 ?>
 
 <script>
-	if(document.getElementById("tierstable").childElementCount == 1)
-		tier = document.getElementById("tierstable").childNodes[0].childElementCount;
-	else tier = 0;
+	tier = document.getElementById("tierstable").childNodes[0].childElementCount;
 	limit = 5;
 
 	window.onload=function(){
-		if(tier < limit)	addtierbutton();
-	}
-
-	function addtierbutton(){
-		addtier = '<a href="javascript:void(0)" id="addtiers">CLICK THIS TO ADD TIERS</a>';
-		a = document.getElementById("tierstiers").innerHTML;
-		document.getElementById("tierstiers").innerHTML = a + addtier;
 		document.getElementById("addtiers").onclick = addingtiers;
 	}
 
 	function addingtiers(){
 		if(tier < limit){
 			var newtier = document.getElementById('tierstable').insertRow(tier);
-			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
-			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1"></textarea>';
-			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
+			tieramt = '<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="proj-tier[AMOUNT][]" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1"></span>';
+			tiertxt = '<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" aria-invalid="false"></textarea></span>';
+			tierrem = '<span><a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tears</a></span>';
 			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
 			tier++;
 			if (tier==limit)	this.parentNode.removeChild(this);
@@ -146,10 +155,15 @@
 	}
 
 	function remove(removetier){
-		a = removetier.parentNode.parentNode;
+		a = removetier.parentNode.parentNode.parentNode;
 		a.parentNode.removeChild(a);
 		tier--;	
-		if(tier==4)		addtierbutton();
+		if(tier==4){
+			addtier = '<a href="javascript:void(0)" id="addtiers">+ try to add me </a>';
+			a = document.getElementById("tierstiers").innerHTML;
+			document.getElementById("tierstiers").innerHTML = a + addtier;
+			document.getElementById("addtiers").onclick = addingtiers;		
+		}	
 	}
 
 	function verifyMe(){
@@ -197,9 +211,15 @@
 	}
 </script>
 
-			</main><!-- #main -->
-	</div><!--#content-inside -->
-</div><!-- #content -->
+
+
+</div><!-- .entry-content -->
+</article><!-- #post-## -->
+
+				</main><!-- #main -->
+		</div><!--#content-inside -->
+	</div><!-- #content -->
+
 
 <footer style="clear:both;display: block">
 	<?php get_footer();?>

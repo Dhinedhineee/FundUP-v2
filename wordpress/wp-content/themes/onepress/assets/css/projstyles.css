@@ -103,6 +103,11 @@
     margin-bottom: 10px;
 }
 
+#projtiers {
+    text-align: center;
+    vertical-align: top;
+}
+
 @media (max-width: 576px) {
     #goal {
         max-width: 100%;
