@@ -7,7 +7,7 @@
 	if (isset($_GET['view']))		
 		$proj_title = htmlspecialchars($_GET['view']);
 	else $proj_title = NULL;
-?>
+	?>
 
 <?php
 	#DATABASE INTEGRATION
@@ -53,8 +53,24 @@
 					echo '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" >';
 				}
 				else 					echo '<img src ="#" alt="No image available for this project." id=\"contentimg\" >';
-				if(IsSet($proj_info))	echo "<p>$proj_info</p>";
+				if(IsSet($proj_info))	echo "<p>".stripcslashes($proj_info)."</p>";
 				else 					echo "<p>Project information not found</p>";
+
+				$query = "SELECT * FROM proj_tiers WHERE proj_id = $proj_id ORDER BY proj_tier_amount";
+				$results = $wpdb->get_results($query);
+				if(IsSet($results) && sizeof($results) != 0){
+					echo '<hr><p style="color: #7b1113; font-weight:600; font-size: 18px;">PROJECT TIERS</p>';
+					echo "<div id='projtiers'>";
+					echo "<table>";
+					foreach ($results as $tier){
+						echo "<td>";
+						echo "<p style='color:#7b1113; font-size: 20px;'>".'P '.number_format($tier->proj_tier_amount)."</p>";
+						echo stripcslashes($tier->proj_tier_desc);
+						echo "</td>";
+					}		
+					echo "</table>";
+					echo "</div>";
+				}
 			?>
 		</div>
 
@@ -166,7 +182,7 @@
 				$commentcount = 0;
 				if(IsSet($result)){
 					foreach ($result as $list) {
-						$user_comment = $list['user_comment'];
+						$user_comment = stripcslashes($list['user_comment']);
 						$action_date = $list['action_date'];
 						if($user_comment != ''){
 							$commentcount++;

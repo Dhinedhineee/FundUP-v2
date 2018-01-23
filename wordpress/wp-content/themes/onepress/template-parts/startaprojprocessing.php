@@ -1,7 +1,5 @@
-
-
 <?php
-	/*Template Name: Edit Project Processing Template*/
+	/*Template Name: Start a Project Processing Template*/
 	/**
 	 * @link https://codex.wordpress.org/Template_Hierarchy
 	 * @package OnePress
@@ -18,73 +16,61 @@
 <div id="content" class="site-content">
 	<div class="page-header">
 		<div class="container">
-			<h1 class="entry-title">Edit A Project</h1>
+			<h1 class="entry-title">Start A Project</h1>
 		</div><!-- container -->
 	</div><!-- page-header -->
 	<div class="container">
 		<div id="primary" class="content-area">
 			<main id="main" class="site-main" role="main">
-	
-<?php 
 
-	if(!IsSet($_SERVER['HTTP_REFERER']) || !IsSet($_POST['proj-name'])){
-		//Unknown site access
-		header('Location: http://localhost/wordpress');
-		die();
-	}
-	$proj_deadline = htmlspecialchars($_POST['proj-deadline']);
-	$proj_title = htmlspecialchars($_POST['proj-name']);
-	$proj_goal = htmlspecialchars($_POST['goal-amount']);
-	$proj_info = htmlspecialchars($_POST['proj-info']);
-	$origprojname = htmlspecialchars($_POST['origprojname']);
+<?php 
+	
+	/*
+	var_dump($_POST['proj-deadline']);
+	var_dump($_POST['proj-name']);
+	var_dump($_POST['goal-amount']);
+	var_dump($_POST['proj-info']);
+	var_dump($_POST['proj-tier']['TEXT']);
+	var_dump($_POST['proj-tier']['AMOUNT']);
+	var_dump($_FILES["proj-image"]['name']);
+	*/
+	###############START OF PROCESSING HERE########################
+
 
 	global $wpdb, $current_user_name;
 	$current_user = wp_get_current_user();
-	$current_user_name = $current_user->display_name;
 
-	if($_FILES['proj-image']['size'] != 0){
-		fileupload();
-		$proj_image = $_FILES['proj-image']['name'];
-	}else {
-		//echo "No file uploaded";
-		$proj_image = $wpdb->get_var("SELECT proj_image FROM projects WHERE proj_title='$origprojname'");
-		$proj_ID = $wpdb->get_var("SELECT proj_id FROM projects WHERE proj_title='$origprojname'");
-	}
-	$proj_ID = $wpdb->get_var("SELECT proj_id FROM projects WHERE proj_title='$origprojname'");
+	$proj_title = htmlspecialchars($_POST['proj-name']);
+	$proj_user = $current_user->display_name;
+	$proj_user_ID = $current_user->ID;
+	$proj_goal = htmlspecialchars($_POST['goal-amount']);
+	$proj_deadline = htmlspecialchars($_POST['proj-deadline']);
+	$proj_info = htmlspecialchars($_POST['proj-info']);
+	//var_dump($_FILES['proj-image']);
+	fileupload();
+	$proj_image = $_FILES['proj-image']['name'];
 
-	$wpdb->update( 
+	$wpdb->insert(
 		'projects', 
 		array( 
+			'proj_title' => $proj_title, 
+			'proj_user' => $proj_user, 
+			'proj_user_ID' => $proj_user_ID,
 			'proj_goal' => $proj_goal,
 			'proj_deadline' => $proj_deadline,
+			'proj_image' => $proj_image,
 			'proj_info' => $proj_info,
-			'proj_image' => $proj_image
-		), 
-		array( 'proj_title' => $origprojname, 'proj_user' => $current_user_name)
+			'proj_date' => date('Y-m-d H:i:s')
+		)
 	);
 
-	if($proj_title != $origprojname){
-		//echo "NOT SAME";
-		$checkdup = $wpdb->get_var("SELECT * FROM projects WHERE proj_title='$proj_title'");
-		if(isset($checkdup)){
-			display("Sorry. Project name already taken!");
-			fileerror();
-		}
-	}
+	$query = "SELECT * FROM projects WHERE proj_title='$proj_title'";
+	$result = $wpdb->get_row($query, ARRAY_A);
+	$proj_ID = $result['proj_id'];
+	//var_dump($result);
 
-	$wpdb->update( 
-		'projects', array( 'proj_title' => $proj_title ), array( 'proj_title' => $origprojname )
-	);
-
-	$wpdb->update( 
-		'user_actions', array( 'proj_title' => $proj_title,),  array( 'proj_title' => $origprojname )
-	);
-
-	$wpdb->delete('proj_tiers', array( 'proj_ID' => $proj_ID ));
-	if(IsSet($_POST['proj-tier']['AMOUNT'])){
-		//var_dump($_POST['proj-tier']['TEXT']);
-		//var_dump($_POST['proj-tier']['AMOUNT']);
-	
+	#################PROJECT TIERS HERE############################
+	if(IsSet($_POST['proj-tier']) && sizeof($_POST['proj-tier']['AMOUNT']) != 0){
 		for ($i = 0; $i < sizeof($_POST['proj-tier']['AMOUNT']); $i++){
 			$proj_tier_desc = htmlspecialchars($_POST['proj-tier']['TEXT'][$i]);
 			$wpdb->insert( 
@@ -93,26 +79,16 @@
 					'proj_ID' => $proj_ID,
 					'proj_tier_amount' => $_POST['proj-tier']['AMOUNT'][$i], 
 					'proj_tier_desc' => $proj_tier_desc
-				), 
-				array('%d','%d','%s') 
+				)
 			);		
 		}
 	}
-	
-	/*
-		debugging purposes
-		//$result1 = $wpdb->get_results("SELECT * FROM projects WHERE proj_title='$origprojname'", ARRAY_A);
-		//var_dump($result1);
-		$result1 = $wpdb->get_results("SELECT * FROM projects WHERE proj_title='$proj_title'", ARRAY_A);
-		$result2 = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
-		var_dump($result1);
-		var_dump($result2);
-	*/
 
-	$url ='http://localhost/wordpress/projinfo/?view='.$proj_title;
-	display("Your project was successfully processed. <br> Redirecting to project page...");
-	redirect($url);
+	$query = "SELECT * FROM proj_tiers WHERE proj_ID='$proj_ID'";
+	$result = $wpdb->get_results($query);
+	//var_dump($result);
 
+	#################IMAGE PROCESSING HERE########################
 	function fileupload(){
 		global $current_user_name;
 		$current_user = wp_get_current_user();
@@ -157,6 +133,7 @@
 		    display("The project photo is of type ".$imageFileType.". Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
 		    $uploadOk = 0;
 		}
+		
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk == 0) {
 		    display("Sorry, there is an error uploading your file.");
@@ -176,10 +153,14 @@
 	function fileerror(){
 		display("Redirecting to previous page...");
 		$url = "{$_SERVER['HTTP_REFERER']}";
+		die();
 		redirect($url);
 	}
 
-	//redirect($url);
+
+	
+	#################END OF PROCESSING HERE########################
+
 	function redirect($url){
 		$string = '<script type="text/javascript">';
 	    $string .= 'setTimeout(function(){window.location = "' . $url . '";}, 5000);';
@@ -191,8 +172,16 @@
 	function display($msg){	
 		echo "<h2>".$msg."</h2>";
 	}
+
+	$url ='http://localhost/wordpress/projinfo/?view='.$proj_title;
+	display("Your project was successfully created. <br> Redirecting to project page...");
+	//die();
+	redirect($url);
+
+	#################END OF REDIRECTION HERE########################
 ?>
-			</main><!-- #main -->
+
+</main><!-- #main -->
 		</div><!-- #primary -->
 	</div><!-- #container -->
 </div><!-- #content -->

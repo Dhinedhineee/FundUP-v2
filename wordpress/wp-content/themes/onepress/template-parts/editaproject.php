@@ -7,15 +7,12 @@
 	if (isset($_GET['edit']))		
 		$proj_title = htmlspecialchars($_GET['edit']);
 	else $proj_title = NULL;
-
-	
 ?>
 
 <?php 
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_title='$proj_title'";
 	$result = $wpdb->get_row($query, ARRAY_A);
-	//var_dump($result);		#for debugging
 	$url = 'http://localhost/wordpress';
 		if(!isset($result)) 					redirect($url);
 		else {
@@ -23,10 +20,7 @@
 				$proj_user = wp_get_current_user()->display_name;
                 $current_user = wp_get_current_user();
                 $curr_user_ID = $current_user->ID;
-                
-                #if($proj_user != $name)			redirect($url);
                 if($proj_user_ID != $curr_user_ID)			redirect($url);
-
 				#HEADER SETUP
 				get_header();
 				$layout = onepress_get_layout();
@@ -45,71 +39,128 @@
 	$proj_deadline = $result['proj_deadline'];
 
 	if(isset($proj_deadline)){
-		$funddate = "This project's current deadline is on ".$result['proj_deadline']."";
 		$mindate = $result['proj_deadline'];
+		$funddate = "This project's current deadline is on ".date('m-d-Y',strtotime($mindate))."";
 	}
 	else{
 		$funddate = "This project's deadline has not been set.";
 		date_default_timezone_set('Asia/Manila');
-		$mindate = date('Y-m-d');
 	}
-	
+	$proj_ID = $result['proj_id'];
 	$proj_fund = $result['proj_fund'];
 	$fundtext = "This project's current fund pledged is P".number_format($proj_fund)."";
 	$proj_image = $result['proj_image'];
 	$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 	$imagetext = '<br><img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br><br>';
-
-	//echo ini_get('post_max_size');
 ?>
 
 	<div id="content" class="site-content">
 		<div class="page-header">
 			<div class="container">
-				<h1 class="entry-title">Edit A Project</h1>			</div>
+				<h1 class="entry-title">Edit A Project</h1>			
+			</div>
 		</div>
 
-		
 		<div id="content-inside" class="container no-sidebar">
-			
 				<main id="main" class="site-main" role="main">
+					<div class="entry-content"></div>
 
-		<article id="post-338" class="post-338 page type-page status-publish hentry">
-	<header class="entry-header">
-			</header><!-- .entry-header -->
+<?php 
+	global $wpdb;
+	$result = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id='$proj_ID';", ARRAY_A);
+	if(isset($result)){
+		$projtiers = '';
+		foreach ($result as $tier) {
+			$projtiers = $projtiers.'<tr>
+			<td><input type="number" name="proj-tier[AMOUNT][]" value="'.$tier['proj_tier_amount'].'" required min="1"/></td>
+			<td><textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1">'.stripcslashes($tier['proj_tier_desc']).'</textarea></td>
+			<td><a href="javascript:void(0);" onclick="remove(this)" id="remtier">Remove Tier</a></td>
+			</tr>';
+		}
+	}
 
-	<div class="entry-content">
-
-</div>
-
-<?php echo'
+	echo'
 		<form action="edit-project-processing" method="post" class="wpcf7-form demo" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
+		
 		<p><label> Project Name<br />
-    	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name"value="'.$proj_title.'" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" aria-invalid="false" id="proj-name"/>
-		<span id="titlealert"></span></span> </label></p>
+		    	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" value="'.$proj_title.'" aria-invalid="false" id="proj-name" required/>
+				<span id="titlealert"></span></span> </label></p>
+
 		<p><label> Goal Amount<br />
-		<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.do_shortcode("[CF7_PROJ_GOAL key='edit']").'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1"/></span></label><span>'.$fundtext.'</span></p>
+				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.do_shortcode("[CF7_PROJ_GOAL key='edit']").'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1" required/></span></label><span>'.$fundtext.'</span></p>
+		
 		<p><label> Project Deadline<br />
-		<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
+					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$mindate.'" min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
+
 		<p><label> Project Information<br />
-		<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
-		<span id="infoalert"></span></span> </label></p>
-		<p><label> Project Photo
-		<span id="imageshow">'.$imagetext.'</span>
-		<p><label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br /><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
-		<span id="imgcontainer2"></span>
+				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
+				<span id="infoalert"></span></span> </label></p>
+	
+		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
+		<span id="tierstiers">
+			<table id="tierstable" style="width:auto;">'.$projtiers.'</table>		
+		</span><span id="tieralert"></span></label>
 		</label></p>
+		
+		<p><label> Current Project Photo
+		<span id="imageshow">'.$imagetext.'</span>
+		<p><label> Upload a new project photo(jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40"  class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
+		<span id="imgcontainer2"></span>
+		
 		<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-form-control wpcf7-submit" /></p>
 		<input type="hidden" name="origprojname" value="'.$proj_title.'" />
 		<div id="submitted"></div>
-		</form>
-		<br>
+		</form><br>
 	';
-
-	
 ?>
 
 <script>
+	if(document.getElementById("tierstable").childElementCount == 1)
+		tier = document.getElementById("tierstable").childNodes[0].childElementCount;
+	else tier = 0;
+	limit = 5;
+
+	window.onload=function(){
+		if(tier < limit)	addtierbutton();
+	}
+
+	function addtierbutton(){
+		addtier = '<a href="javascript:void(0)" id="addtiers">CLICK THIS TO ADD TIERS</a>';
+		a = document.getElementById("tierstiers").innerHTML;
+		document.getElementById("tierstiers").innerHTML = a + addtier;
+		document.getElementById("addtiers").onclick = addingtiers;
+	}
+
+	function addingtiers(){
+		if(tier < limit){
+			var newtier;
+			if(tier == 0){
+				newtier = document.getElementById('tierstable').insertRow(tier);
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Description</th><th></th>"
+			}
+			newtier = document.getElementById('tierstable').insertRow(tier);
+			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
+			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
+			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
+			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
+			tier++;
+			if (tier==limit)	this.parentNode.removeChild(this);
+		} 
+	}
+
+	function remove(removetier){
+		a = removetier.parentNode.parentNode;
+		a.parentNode.removeChild(a);
+		tier--;	
+		if(tier==4)		addtierbutton();
+		if(tier==0)		removetierheader(removetier);
+	}
+
+	function removetierheader(){
+		a = document.getElementById('tierstable').childNodes[0];
+		document.getElementById('tierstable').removeChild(a);
+	}
+
 	function verifyMe(){
 		var oFile = document.getElementById("proj-image").files[0]; 
 		if (oFile != null){
@@ -131,6 +182,7 @@
         	document.getElementById("imageshow").innerHTML = '<?php echo $imagetext; ?>';
         }
 	}
+	
 	function submitted(){
 		var x = 0;
 		if (document.getElementById("proj-name").value == "" || document.getElementById("proj-name").value.replace(/\s+/g, '') == ""){
@@ -154,15 +206,9 @@
 	}
 </script>
 
-
-
-</div><!-- .entry-content -->
-</article><!-- #post-## -->
-
-				</main><!-- #main -->
-		</div><!--#content-inside -->
-	</div><!-- #content -->
-
+			</main><!-- #main -->
+	</div><!--#content-inside -->
+</div><!-- #content -->
 
 <footer style="clear:both;display: block">
 	<?php get_footer();?>
