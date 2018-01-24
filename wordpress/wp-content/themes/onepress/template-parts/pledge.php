@@ -5,9 +5,7 @@
 	 *
 	 * @package OnePress
 	 */
-?>
 
-<?
 	global $wpdb;
 	if(!IsSet($_SERVER['HTTP_REFERER'])){
 		$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
