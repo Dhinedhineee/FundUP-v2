@@ -46,10 +46,8 @@ add_filter( 'wppb_check_form_field_default-nickname', 'wppb_check_nickname_value
 
 /* handle field save */
 function wppb_userdata_add_nickname( $userdata, $global_request ){
-	if ( isset( $global_request['nickname'] ) ) {
+	if ( isset( $global_request['nickname'] ) )
 		$userdata['nickname'] = sanitize_text_field( trim( $global_request['nickname'] ) );
-		$userdata['display_name'] = $userdata['nickname'];
-	}
 		
 	return $userdata;
 }

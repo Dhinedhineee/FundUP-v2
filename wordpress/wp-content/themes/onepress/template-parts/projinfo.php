@@ -4,23 +4,26 @@
 	 * @link https://codex.wordpress.org/Template_Hierarchy
 	 * @package OnePress
 	 */
+
+	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
+	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
+
 	if (isset($_GET['view']))		
 		$proj_id = htmlspecialchars($_GET['view']);
 
 	if(!is_numeric($proj_id)){
-		header('Location: http://localhost/wordpress');die();
+		header('Location: '.$hostlink);die();
 	}
 ?>
 
-<?php
+<?
 	#DATABASE INTEGRATION
 	global $wpdb;
-
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
 	//var_dump($result);		#for debugging
 		if(!isset($result)){
-			header('Location: http://localhost/wordpress');die();
+			header('Location: '.$hostlink);die();
 		} else {
 			$proj_title = $result['proj_title'];
 			$proj_user = $result['proj_user'];
@@ -46,13 +49,13 @@
 	
 	<div id="goal">		
 		<div id="contentgoal">
-			<?php 	
+			<?
 				if(IsSet($proj_title))	echo "<p><h2>$proj_title</h2></p>";
 				else 					echo "<h2>Project name not found</h2>";
-				if(IsSet($proj_user))	echo "<p><h4>by <a href='http://localhost/wordpress/user-profile/?view=$user_ID' style='color:#7b1113;' >$proj_user</a></h4></p>";
+				if(IsSet($proj_user))	echo "<p><h4>by <a href='".$hostlink."/user-profile/?view=$user_ID' style='color:#7b1113;' >$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
-					$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
+					$imgloc = $hostlink."/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 					echo '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" >';
 				}
 				else 					echo '<img src ="#" alt="No image available for this project." id=\"contentimg\" >';
@@ -81,17 +84,17 @@
 		<div id="sidebarprojinfo">
 			<div id="asidegoal">
 				<p style="color:#7b1113;"><b>Goal PHP</b></p>
-				<?php 
+				<?
 					if(IsSet($proj_goal))	{echo "<span>P</span>";
 											echo "<span style='float:right; letter-spacing:2px;  overflow-wrap:break-word;'>".number_format($proj_goal)."</span>";}
 					else 					echo "<p>Goal amount not set</p>";
 				?>		
 				<br><p style="color:#7b1113;"><b>Raised PHP</b></p>
-				<?php 
+				<?
 					echo "<span>P</span>";
 					echo "<span style='float:right; letter-spacing:2px;  overflow-wrap:break-word;'>".number_format($proj_fund)."</span>";
 				?>
-				<?php 
+				<?
 					if(isSet($proj_deadline)){
 						date_default_timezone_set('Asia/Manila');
 						$hey = new DateTime($proj_deadline);
@@ -123,7 +126,7 @@
 			<br>
 			<div id="asidedonor">
 				<div id="donatewidget">
-				<?php 
+				<?
 				global $user_tier, $user_pledge;
 				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
 				if ($proj_finished){
@@ -138,8 +141,8 @@
 				else if (!is_user_logged_in()){
 					echo "<p style='text-transform:none; text-align:center; color:black;'>
 						You need to be a registered user to donate. Click here to 
-						<a href='http://localhost/wordpress/signup/'><strong>register</strong></a> or 
-						<a href='http://localhost/wordpress/login/''><strong>sign in</strong></a>.
+						<a href='".$hostlink."/signup/'><strong>register</strong></a> or 
+						<a href='".$hostlink."/login/'><strong>sign in</strong></a>.
 						</p>";
 				} else {
 					echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P".number_format($user_pledge);
@@ -168,7 +171,7 @@
 					</script>
 					<br><hr></div>
 				<br><h5>PLEDGERS' LIST</h5>
-				<ul><?php
+				<ul><?
 						$pledgecount = 0;
 						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id';", ARRAY_A);
 						if(IsSet($result))
@@ -186,7 +189,7 @@
 		
 		<div id="projcomments">
 			<hr><p style="color: #7b1113;">PLEDGERS' COMMENTS</p>
-			<?php
+			<?
 				$commentcount = 0;
 				if(IsSet($result)){
 					foreach ($result as $list) {
@@ -200,7 +203,7 @@
 									else{
 										$pledger = $list['user'];	
 										$user_ID = $list['user_ID'];	
-										echo "<a href='http://localhost/wordpress/user-profile/?view=$user_ID'>$pledger</a>";	
+										echo "<a href='".$hostlink."/user-profile/?view=$user_ID'>$pledger</a>";	
 									}
 								echo '</div>';
 								echo '<div id="pledgedate">';
@@ -234,7 +237,7 @@
 	</div>
 <br>
 
-<?php 
+<?
 	function backersnum($results, $wpdb, $proj_id){
 		global $user_tier, $user_pledge;
 		$user_tier = 0;
@@ -281,5 +284,5 @@
 	}
 ?>
 <footer style="clear:both;display: block">
-	<?php get_footer();?>
+	<? get_footer();?>
 </footer>

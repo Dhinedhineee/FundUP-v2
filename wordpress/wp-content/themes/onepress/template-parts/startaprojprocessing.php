@@ -4,10 +4,12 @@
 	 * @link https://codex.wordpress.org/Template_Hierarchy
 	 * @package OnePress
 	 */
+	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
+	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
 
 	if(!IsSet($_SERVER['HTTP_REFERER'])){
 		//Unknown site access
-		header('Location: http://localhost/wordpress');
+		header('Location: '.$hostlink);
 		die();
 	}
 	#HEADER 
@@ -28,7 +30,7 @@
 		<div id="primary" class="content-area">
 			<main id="main" class="site-main" role="main">
 
-<?php 
+<?
 	/*
 	var_dump($_POST['proj-deadline']);
 	var_dump($_POST['proj-name']);
@@ -165,7 +167,7 @@
 	
 	#################END OF PROCESSING HERE########################
 
-	$url ='http://localhost/wordpress/projinfo/?view='.$proj_ID;
+	$url = $hostlink.'/projinfo/?view='.$proj_ID;
 	display("Your project was successfully created. <br> Redirecting to project page...");
 	redirect($url);
 	#################END OF REDIRECTION HERE########################
@@ -192,5 +194,5 @@
 
 <!-- #footer is not sent because of automatic redirection -->
 <footer style="clear:both;display: block">
-	<?php get_footer();?>
+	<? get_footer();?>
 </footer>

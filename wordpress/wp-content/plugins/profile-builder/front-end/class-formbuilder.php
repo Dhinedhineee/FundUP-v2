@@ -403,9 +403,9 @@ class Profile_Builder_Form_Creator{
 			echo $this->wppb_output_form_fields( $_REQUEST, $field_check_errors, $this->args['form_fields'] );
 			echo apply_filters( 'wppb_after_form_fields', '</ul>', $this->args['form_type'], $this->args['ID'] );
 
-			/*echo apply_filters( 'wppb_before_send_credentials_checkbox', '<ul>', $this->args['form_type'], $this->args['ID'] );
+			echo apply_filters( 'wppb_before_send_credentials_checkbox', '<ul>', $this->args['form_type'], $this->args['ID'] );
 			$this->wppb_add_send_credentials_checkbox( $_REQUEST, $this->args['form_type'] );
-			echo apply_filters( 'wppb_after_send_credentials_checkbox', '</ul>', $this->args['form_type'] );*/
+			echo apply_filters( 'wppb_after_send_credentials_checkbox', '</ul>', $this->args['form_type'] );
 
             $wppb_form_submit_extra_attr = apply_filters( 'wppb_form_submit_extra_attr', '', $this->args['form_type'], $this->args['ID'] );
 			?>
@@ -473,7 +473,7 @@ class Profile_Builder_Form_Creator{
 	}
 
 	
-	/*function wppb_add_send_credentials_checkbox ( $request_data, $form ){
+	function wppb_add_send_credentials_checkbox ( $request_data, $form ){
 		if ( $form == 'edit_profile' )
 			echo '';
 		
@@ -483,7 +483,7 @@ class Profile_Builder_Form_Creator{
 			$wppb_general_settings = get_option( 'wppb_general_settings' );
 			echo ( isset( $wppb_general_settings['emailConfirmation'] ) && ( $wppb_general_settings['emailConfirmation'] == 'yes' ) ? '' : $checkbox );
 		}
-	}*/
+	}
 	
 	
 	function wppb_test_required_form_values( $global_request ){
@@ -602,7 +602,7 @@ class Profile_Builder_Form_Creator{
             $userdata = wp_unslash( $userdata );
 
             // change User Registered date and time according to timezone selected in WordPress settings
-            $wppb_get_date = wppb_get_date_by_timezone();
+            $wppb_get_date = wppb_get_register_date();
 
             if( isset( $wppb_get_date ) ) {
                 $userdata['user_registered'] = $wppb_get_date;
@@ -706,7 +706,7 @@ class Profile_Builder_Form_Creator{
             $html = ob_get_clean();
             return "{$html}";
         } catch (Exception $exception) {
-            return '';
+            return __( 'Something went wrong. Please try again!', 'profile-builder');
         }
     }
 }
