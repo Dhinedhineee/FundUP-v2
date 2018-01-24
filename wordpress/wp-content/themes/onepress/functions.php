@@ -510,6 +510,44 @@ function cf7_proj_image($atts){
 add_shortcode('CF7_PROJ_IMAGE', 'cf7_proj_image');
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+add_action('profile_update', 'update_tables', 10, 2);
+
+function update_tables($id, $data) {
+	global $wpdb;
+	$user_data = get_userdata($id);
+	$name = $user_data->first_name;
+
+	$wpdb->update(
+		'wp_users',
+		array(
+			'display_name' => $name
+		),
+		array(
+			'ID' => $id
+		)
+	);
+
+	$wpdb->update(
+		'projects',
+		array(
+			'proj_user' => $name
+		),
+		array(
+			'proj_user_ID' => $id
+		)
+	);
+
+	$wpdb->update(
+		'user_actions',
+		array(
+			'user' => $name
+		),
+		array(
+			'user_ID' => $id
+		)
+	);
+}
+
 function add_this_script_footer(){ ?>
  
     <script>
