@@ -4,11 +4,12 @@
  * @link https://codex.wordpress.org/Template_Hierarchy
  * @package OnePress
  */
-?>
 
-<?php
+	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
+	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
+
 	if(!is_user_logged_in()){
-		header('Location: http://localhost/wordpress');
+		header('Location: '.$hostlink);
 		die();
 	}
 
@@ -36,7 +37,7 @@
 	<p><label> Goal Amount<br>
 	<span class="goal-amount"><input type="number" required name="goal-amount" min="1"/></span></label></p>
 	
-	<?php 
+	<?
 		$mindate = date_default_timezone_set('Asia/Manila');
 		$mindate = date('Y-m-d');
 		echo '
@@ -161,5 +162,5 @@
 </div><!-- #content -->
 
 <footer style="clear:both;display: block">
-	<?php get_footer();?>
+	<? get_footer();?>
 </footer>

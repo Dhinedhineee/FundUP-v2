@@ -5,19 +5,22 @@
 	 * @package OnePress
 	 */
 	
+	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
+	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
+
 	if (isset($_GET['edit']))		
 		$proj_id = htmlspecialchars($_GET['edit']);
 
 	if(!is_numeric($proj_id)){
-		header('Location: http://localhost/wordpress');die();
+		header('Location: '.$hostlink);die();
 	}
 ?>
 
-<?php 
+<?
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
-	$url = 'http://localhost/wordpress';
+	$url = $hostlink;
 		if(!isset($result)) 					redirect($url);
 		else {
 				$proj_title = $result['proj_title'];
@@ -54,7 +57,7 @@
 	$proj_fund = $result['proj_fund'];
 	$fundtext = "This project's current fund pledged is P".number_format($proj_fund)."";
 	$proj_image = $result['proj_image'];
-	$imgloc = "/wordpress/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
+	$imgloc = $hostlink."/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 	$imagetext = '<br><img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br><br>';
 ?>
 
@@ -69,7 +72,7 @@
 				<main id="main" class="site-main" role="main">
 					<div class="entry-content"></div>
 
-<?php 
+<?
 	global $wpdb;
 	$result = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id='$proj_ID';", ARRAY_A);
 	if(isset($result)){
