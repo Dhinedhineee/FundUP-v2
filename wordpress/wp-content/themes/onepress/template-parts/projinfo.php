@@ -5,21 +5,24 @@
 	 * @package OnePress
 	 */
 	if (isset($_GET['view']))		
-		$proj_title = htmlspecialchars($_GET['view']);
-	else $proj_title = NULL;
-	?>
+		$proj_id = htmlspecialchars($_GET['view']);
+
+	if(!is_numeric($proj_id)){
+		header('Location: http://localhost/wordpress');die();
+	}
+?>
 
 <?php
 	#DATABASE INTEGRATION
 	global $wpdb;
-	$query = "SELECT * FROM projects WHERE proj_title='$proj_title'";
+
+	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
 	//var_dump($result);		#for debugging
 		if(!isset($result)){
-			die();
 			header('Location: http://localhost/wordpress');die();
 		} else {
-			$proj_id = $result['proj_id'];
+			$proj_title = $result['proj_title'];
 			$proj_user = $result['proj_user'];
 			$proj_user_ID = $result['proj_user_ID'];
 			$proj_goal = $result['proj_goal'];
@@ -58,18 +61,19 @@
 
 				$query = "SELECT * FROM proj_tiers WHERE proj_id = $proj_id ORDER BY proj_tier_amount";
 				$results = $wpdb->get_results($query);
-				if(IsSet($results) && sizeof($results) != 0){
+				if(IsSet($results) && sizeof($results)){
+					$backernum = backersnum($results, $wpdb, $proj_id);
 					echo '<hr><p style="color: #7b1113; font-weight:600; font-size: 18px;">PROJECT TIERS</p>';
-					echo "<div id='projtiers'>";
-					echo "<table>";
-					foreach ($results as $tier){
+					echo "<div id='projtiers'><table>";
+					for ($i = 0; $i <= sizeof($results)-1; $i++){
 						echo "<td>";
-						echo "<p style='color:#7b1113; font-size: 20px;'>".'P '.number_format($tier->proj_tier_amount)."</p>";
-						echo stripcslashes($tier->proj_tier_desc);
-						echo "</td>";
+						echo "<p style='color:#7b1113; font-size: 20px;'>".'P '.number_format($results[$i]->proj_tier_amount)."</p>";
+						echo stripcslashes($results[$i]->proj_tier_desc);
+						echo "<br><br><p style='color:#7b1113;'>Backers: ";
+						echo (isSet($backernum[$i])) ? $backernum[$i]:0;
+						echo "</p></td>";	
 					}		
-					echo "</table>";
-					echo "</div>";
+					echo "</table></div>";
 				}
 			?>
 		</div>
@@ -88,7 +92,7 @@
 					echo "<span style='float:right; letter-spacing:2px;  overflow-wrap:break-word;'>".number_format($proj_fund)."</span>";
 				?>
 				<?php 
-					if(isset($proj_deadline)){
+					if(isSet($proj_deadline)){
 						date_default_timezone_set('Asia/Manila');
 						$hey = new DateTime($proj_deadline);
 						$localtime = new DateTime();
@@ -120,24 +124,28 @@
 			<div id="asidedonor">
 				<div id="donatewidget">
 				<?php 
-					if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
-				?>
-				<?php
-				if ($proj_finished){}
-				else if (!is_user_logged_in() ){
+				global $user_tier, $user_pledge;
+				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
+				if ($proj_finished){
+					if (is_user_logged_in()){		
+						if(IsSet($user_pledge)){
+							echo "<br><hr><p style='text-align:center; font-size: 12px; text-transform:none;'>You had pledged P".number_format($user_pledge);
+							if(isSet($user_tier) && $user_tier) echo " and had backed tier level $user_tier";
+							echo " in the project! Thank you for your support!</p>";
+						}
+					}
+				}
+				else if (!is_user_logged_in()){
 					echo "<p style='text-transform:none; text-align:center; color:black;'>
 						You need to be a registered user to donate. Click here to 
 						<a href='http://localhost/wordpress/signup/'><strong>register</strong></a> or 
 						<a href='http://localhost/wordpress/login/''><strong>sign in</strong></a>.
 						</p>";
 				} else {
-					$current_user = wp_get_current_user();
-					$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_id' AND user_ID='$current_user->ID'";
-					$user_donate = $wpdb->get_var($query);
-						
-					if(!IsSet($user_donate)) 	$user_donate = 0;
-					echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P$user_donate in the project!</p>";
-					if($user_donate > 0)	echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO DONATE AGAIN?</strong></p>";	
+					echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P".number_format($user_pledge);
+					if($user_tier) echo " and have backed tier level $user_tier";
+					echo " in the project!</p>";
+					if($user_pledge)	echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO DONATE AGAIN?</strong></p>";	
 					echo "<form action='pledge-processing' method='post'>
 								<input type='hidden' name='proj_ID' value='$proj_id'>
 								<input type='hidden' name='proj_title' value='$proj_title'>
@@ -191,7 +199,6 @@
 									if($list['anon'] == 1)	echo "Anonymous";
 									else{
 										$pledger = $list['user'];	
-										#$user_id = $wpdb->get_var("SELECT ID FROM wp_users WHERE display_name='$pledger'");
 										$user_ID = $list['user_ID'];	
 										echo "<a href='http://localhost/wordpress/user-profile/?view=$user_ID'>$pledger</a>";	
 									}
@@ -225,8 +232,54 @@
 			?>
 		</div>	
 	</div>
-
 <br>
+
+<?php 
+	function backersnum($results, $wpdb, $proj_id){
+		global $user_tier, $user_pledge;
+		$user_tier = 0;
+		$user_pledge = 0;
+		$query2 = "SELECT * FROM user_actions WHERE proj_id = $proj_id ORDER BY user_ID";
+		$results2 = $wpdb->get_results($query2);
+		if(sizeof($results2)){
+			$ctr = 0;
+			foreach($results2 as $pledger){
+				$check = 0;
+				if($ctr){
+					$ind = array_search($pledger->user_ID, array_column($backer, 'user_ID'));
+					if((!$ind && $backer[$ind]['user_ID'] == $pledger->user_ID) || $ind){
+						$backer[$ind]['pledge'] += $pledger->fund_given;
+							$check = 1;
+					}
+				}
+				if(!$check)
+				{
+					$backer[$ctr]['user_ID'] = $pledger->user_ID;
+					$backer[$ctr]['pledge'] = $pledger->fund_given;
+					$ctr++;
+				}	
+			}
+			if (is_user_logged_in()){
+				$current_user = wp_get_current_user();
+				$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_id' AND user_ID='$current_user->ID'";
+				$user_pledge = $wpdb->get_var($query);
+				if(!IsSet($user_pledge)) 	$user_pledge = 0;
+			}
+			for ($i = 0; $i <= sizeof($results)-1; $i++){
+				$curr = $results[$i]->proj_tier_amount;
+				if($i != sizeof($results)-1)	$next = $results[$i+1]->proj_tier_amount;
+				else 							$next = 10000000000;
+				$backernum[$i] = sizeof(array_filter(array_column($backer, 'pledge'), function ($var) use ($curr, $next) {return ( $var >= $curr && $var < $next);}));
+				if(is_user_logged_in() && tierlevel($user_pledge, $curr, $next))		$user_tier = $i+1;
+			}	
+		}else return null;
+		return $backernum;
+	}
+
+	function tierlevel($var, $curr, $next){
+		return ($var >= $curr && $var < $next);
+	}
+?>
 <footer style="clear:both;display: block">
 	<?php get_footer();?>
 </footer>

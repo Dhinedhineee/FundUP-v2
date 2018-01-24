@@ -4,19 +4,26 @@
 	 * @link https://codex.wordpress.org/Template_Hierarchy
 	 * @package OnePress
 	 */
+	
 	if (isset($_GET['edit']))		
-		$proj_title = htmlspecialchars($_GET['edit']);
-	else $proj_title = NULL;
+		$proj_id = htmlspecialchars($_GET['edit']);
+
+	if(!is_numeric($proj_id)){
+		header('Location: http://localhost/wordpress');die();
+	}
 ?>
 
 <?php 
 	global $wpdb;
-	$query = "SELECT * FROM projects WHERE proj_title='$proj_title'";
+	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
 	$url = 'http://localhost/wordpress';
 		if(!isset($result)) 					redirect($url);
 		else {
+				$proj_title = $result['proj_title'];
+				$proj_goal = $result['proj_goal'];
 				$proj_user_ID = $result['proj_user_ID'];
+				$proj_info = $result['proj_info'];
 				$proj_user = wp_get_current_user()->display_name;
                 $current_user = wp_get_current_user();
                 $curr_user_ID = $current_user->ID;
@@ -38,10 +45,7 @@
 	
 	$proj_deadline = $result['proj_deadline'];
 
-	if(isset($proj_deadline)){
-		$mindate = $result['proj_deadline'];
-		$funddate = "This project's current deadline is on ".date('m-d-Y',strtotime($mindate))."";
-	}
+	if(isset($proj_deadline))	$funddate = "This project's current deadline is on ".date_format(date_create_from_format('Y-m-d', $proj_deadline), 'm-d-Y');
 	else{
 		$funddate = "This project's deadline has not been set.";
 		date_default_timezone_set('Asia/Manila');
@@ -87,13 +91,13 @@
 				<span id="titlealert"></span></span> </label></p>
 
 		<p><label> Goal Amount<br />
-				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.do_shortcode("[CF7_PROJ_GOAL key='edit']").'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1" required/></span></label><span>'.$fundtext.'</span></p>
+				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1" required/></span></label><span>'.$fundtext.'</span></p>
 		
 		<p><label> Project Deadline<br />
-					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$mindate.'" min="'.$mindate.'"/></span></label><span>'.$funddate.'</span></p>
+					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$proj_deadline.'" min="'.$proj_deadline.'"/></span></label><span>'.$funddate.'</span></p>
 
 		<p><label> Project Information<br />
-				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.do_shortcode("[CF7_PROJ_INFO key='edit']").'</textarea>
+				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.$proj_info.'</textarea>
 				<span id="infoalert"></span></span> </label></p>
 	
 		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
@@ -108,7 +112,7 @@
 		<span id="imgcontainer2"></span>
 		
 		<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-form-control wpcf7-submit" /></p>
-		<input type="hidden" name="origprojname" value="'.$proj_title.'" />
+		<input type="hidden" name="proj-id" value="'.$proj_ID.'" />
 		<div id="submitted"></div>
 		</form><br>
 	';

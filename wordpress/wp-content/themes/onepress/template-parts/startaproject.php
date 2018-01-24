@@ -7,13 +7,11 @@
 ?>
 
 <?php
-	#need to check if user is logged in and redirect as needed
-/*
-	if(!IsSet($_SERVER['HTTP_REFERER'])){
+	if(!is_user_logged_in()){
 		header('Location: http://localhost/wordpress');
 		die();
 	}
-*/
+
 	get_header();
 	$layout = onepress_get_layout();
 ?>
