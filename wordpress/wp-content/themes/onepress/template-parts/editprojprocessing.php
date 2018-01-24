@@ -36,7 +36,7 @@
 	$proj_title = htmlspecialchars($_POST['proj-name']);
 	$proj_goal = htmlspecialchars($_POST['goal-amount']);
 	$proj_info = htmlspecialchars($_POST['proj-info']);
-	$origprojname = htmlspecialchars($_POST['origprojname']);
+	$proj_ID = htmlspecialchars($_POST['proj-id']);
 
 	global $wpdb, $current_user_name;
 	$current_user = wp_get_current_user();
@@ -45,13 +45,8 @@
 	if($_FILES['proj-image']['size'] != 0){
 		fileupload();
 		$proj_image = $_FILES['proj-image']['name'];
-	}else {
-		//echo "No file uploaded";
-		$proj_image = $wpdb->get_var("SELECT proj_image FROM projects WHERE proj_title='$origprojname'");
-		$proj_ID = $wpdb->get_var("SELECT proj_id FROM projects WHERE proj_title='$origprojname'");
-	}
-	$proj_ID = $wpdb->get_var("SELECT proj_id FROM projects WHERE proj_title='$origprojname'");
-
+	}else 	$proj_image = $wpdb->get_var("SELECT proj_image FROM projects WHERE proj_id='$proj_ID'");
+	
 	$wpdb->update( 
 		'projects', 
 		array( 
@@ -60,9 +55,10 @@
 			'proj_info' => $proj_info,
 			'proj_image' => $proj_image
 		), 
-		array( 'proj_title' => $origprojname, 'proj_user' => $current_user_name)
+		array( 'proj_id' => $proj_ID, 'proj_user' => $current_user_name)
 	);
 
+	/*ARE PROJECT HAVING THE SAME NAMES ALLOWED?
 	if($proj_title != $origprojname){
 		//echo "NOT SAME";
 		$checkdup = $wpdb->get_var("SELECT * FROM projects WHERE proj_title='$proj_title'");
@@ -70,14 +66,14 @@
 			display("Sorry. Project name already taken!");
 			fileerror();
 		}
-	}
+	}*/
 
 	$wpdb->update( 
-		'projects', array( 'proj_title' => $proj_title ), array( 'proj_title' => $origprojname )
+		'projects', array( 'proj_title' => $proj_title ), array( 'proj_id' => $proj_ID )
 	);
 
 	$wpdb->update( 
-		'user_actions', array( 'proj_title' => $proj_title,),  array( 'proj_title' => $origprojname )
+		'user_actions', array( 'proj_title' => $proj_title,),  array( 'proj_ID' => $proj_ID )
 	);
 
 	$wpdb->delete('proj_tiers', array( 'proj_ID' => $proj_ID ));
@@ -98,18 +94,8 @@
 			);		
 		}
 	}
-	
-	/*
-		debugging purposes
-		//$result1 = $wpdb->get_results("SELECT * FROM projects WHERE proj_title='$origprojname'", ARRAY_A);
-		//var_dump($result1);
-		$result1 = $wpdb->get_results("SELECT * FROM projects WHERE proj_title='$proj_title'", ARRAY_A);
-		$result2 = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_title='$proj_title'", ARRAY_A);
-		var_dump($result1);
-		var_dump($result2);
-	*/
 
-	$url ='http://localhost/wordpress/projinfo/?view='.$proj_title;
+	$url ='http://localhost/wordpress/projinfo/?view='.$proj_ID;
 	display("Your project was successfully processed. <br> Redirecting to project page...");
 	redirect($url);
 
@@ -182,7 +168,7 @@
 	//redirect($url);
 	function redirect($url){
 		$string = '<script type="text/javascript">';
-	    $string .= 'setTimeout(function(){window.location = "' . $url . '";}, 5000);';
+	    $string .= 'setTimeout(function(){window.location = "' . $url . '";}, 5	);';
 	    $string .= '</script>';
 	    echo $string;
 	    die();

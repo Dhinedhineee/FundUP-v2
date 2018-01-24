@@ -5,6 +5,11 @@
 	 * @package OnePress
 	 */
 
+	if(!IsSet($_SERVER['HTTP_REFERER'])){
+		//Unknown site access
+		header('Location: http://localhost/wordpress');
+		die();
+	}
 	#HEADER 
 	get_header();
 	$layout = onepress_get_layout();
@@ -24,7 +29,6 @@
 			<main id="main" class="site-main" role="main">
 
 <?php 
-	
 	/*
 	var_dump($_POST['proj-deadline']);
 	var_dump($_POST['proj-name']);
@@ -161,9 +165,14 @@
 	
 	#################END OF PROCESSING HERE########################
 
+	$url ='http://localhost/wordpress/projinfo/?view='.$proj_ID;
+	display("Your project was successfully created. <br> Redirecting to project page...");
+	redirect($url);
+	#################END OF REDIRECTION HERE########################
+
 	function redirect($url){
 		$string = '<script type="text/javascript">';
-	    $string .= 'setTimeout(function(){window.location = "' . $url . '";}, 5000);';
+	    $string .= 'setTimeout(function(){window.location = "' . $url . '";}, 5);';
 	    $string .= '</script>';
 	    echo $string;
 	    die();
@@ -172,13 +181,7 @@
 	function display($msg){	
 		echo "<h2>".$msg."</h2>";
 	}
-
-	$url ='http://localhost/wordpress/projinfo/?view='.$proj_title;
-	display("Your project was successfully created. <br> Redirecting to project page...");
-	//die();
-	redirect($url);
-
-	#################END OF REDIRECTION HERE########################
+	
 ?>
 
 </main><!-- #main -->
