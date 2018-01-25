@@ -22,17 +22,6 @@
 		$user_role = 'no user';
 	}
 
-	global $wpdb;
-	$info = $wpdb->get_row("SELECT * FROM wp_users WHERE ID=$user_ID", ARRAY_A);
-	$info2 = $wpdb->get_row("SELECT meta_value FROM wp_usermeta WHERE user_id=$user_ID AND meta_key='description'", ARRAY_A);
-
-	$user_name = $info['display_name'];
-	$user_bio = $info2['meta_value'];
-	//$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
-
-	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user='$user_name'", ARRAY_A);
-	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user='$user_name'", ARRAY_A);
-
 	get_header();
 	$layout = onepress_get_layout();
 	echo onepress_breadcrumb();
@@ -60,6 +49,8 @@
 						} else {
 							echo '<a href="http://localhost/wordpress/admin-dashboard/users">Show list of users</a><br />';
 							echo '<a href="http://localhost/wordpress/admin-dashboard/projects">Show list of projects</a><br />';
+							echo '<a href="http://localhost/wordpress/signup">Add a user</a><br />';
+                            echo '<a href="http://localhost/wordpress/add-admin">Add an administrator</a><br />';
 						}
 					?>
 

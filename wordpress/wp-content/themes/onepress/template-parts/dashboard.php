@@ -23,8 +23,8 @@
 	$user_bio = $info2['meta_value'];
 	//$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
 
-	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user='$user_name'", ARRAY_A);
-	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user='$user_name'", ARRAY_A);
+	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user_ID='$user_ID'", ARRAY_A);
+	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user_ID='$user_ID'", ARRAY_A);
 
 	get_header();
 	$layout = onepress_get_layout();
@@ -59,7 +59,7 @@
 						if ($projects) {
 							echo '<table class="projects">';
 							foreach ($projects as $project) {
-								echo '<tr><td class="title"><a href="http://localhost/wordpress/edit-project/?edit='.$project['proj_title'].'">[edit]</a> <a href="http://localhost/wordpress/projinfo/?view='.$project['proj_title'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/edit-project/?edit='.$project['proj_id'].'">[edit]</a> <a href="http://localhost/wordpress/projinfo/?view='.$project['proj_id'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
 							}
 							echo '</table>';
 						} else {
@@ -72,7 +72,7 @@
 						if ($pledged) {
 							echo '<table class="projects">';
 							foreach ($pledged as $project) {
-								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_title'].'">'.$project['proj_title'].'</a></td><td class="money">Amount pledged: P'.$project['fund_given'].'</td>';
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_id'].'">'.$project['proj_title'].'</a></td><td class="money">Amount pledged: P'.$project['fund_given'].'</td>';
 								if ($project['user_comment']) {
 									echo '<td class="comment">Comment: '.$project['user_comment'].'</td></tr>';
 								} else {
