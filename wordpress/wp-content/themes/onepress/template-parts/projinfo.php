@@ -14,9 +14,7 @@
 	if(!is_numeric($proj_id)){
 		header('Location: '.$hostlink);die();
 	}
-?>
 
-<?
 	#DATABASE INTEGRATION
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";

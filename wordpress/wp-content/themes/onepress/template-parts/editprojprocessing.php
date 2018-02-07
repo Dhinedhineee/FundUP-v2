@@ -74,7 +74,7 @@
 
 	$wpdb->update( 
 		'user_actions', array( 'proj_title' => $proj_title,),  array( 'proj_ID' => $proj_ID )
-	);
+		);
 
 	$wpdb->delete('proj_tiers', array( 'proj_ID' => $proj_ID ));
 	if(IsSet($_POST['proj-tier']['AMOUNT'])){

@@ -23,10 +23,10 @@
 	$url = $hostlink;
 		if(!isset($result)) 					redirect($url);
 		else {
-				$proj_title = $result['proj_title'];
+				$proj_title = stripcslashes($result['proj_title']);
 				$proj_goal = $result['proj_goal'];
 				$proj_user_ID = $result['proj_user_ID'];
-				$proj_info = $result['proj_info'];
+				$proj_info = stripcslashes($result['proj_info']);
 				$proj_user = wp_get_current_user()->display_name;
                 $current_user = wp_get_current_user();
                 $curr_user_ID = $current_user->ID;
