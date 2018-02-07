@@ -126,6 +126,10 @@
 				<div id="donatewidget">
 				<?
 				global $user_tier, $user_pledge;
+				$current_user = wp_get_current_user();
+                $query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+				$user_pledge = $wpdb->get_var($query);
+
 				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
 				if ($proj_finished){
 					if (is_user_logged_in()){		

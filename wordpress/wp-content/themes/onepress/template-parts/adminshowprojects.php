@@ -60,7 +60,7 @@
 												'.$project['proj_title'].' by ' .$project['proj_user']. '
 											</td>
 											<td class="options">
-												<a href="http://localhost/wordpress/projinfo/?view=' .$project['proj_title']. '">[View]</a>
+												<a href="http://localhost/wordpress/projinfo/?view=' .$project['proj_id']. '">[View]</a>
 											</td>
 											<td class="options">
 												<form method="post" action="/wordpress/wp-content/themes/onepress/template-parts/delete.php">
