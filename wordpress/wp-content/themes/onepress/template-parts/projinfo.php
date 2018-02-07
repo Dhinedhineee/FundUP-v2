@@ -14,7 +14,7 @@
 	if(!is_numeric($proj_id)){
 		header('Location: '.$hostlink);die();
 	}
-
+        
 	#DATABASE INTEGRATION
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
@@ -126,10 +126,10 @@
 				<div id="donatewidget">
 				<?
 				global $user_tier, $user_pledge;
-				$current_user = wp_get_current_user();
-                $query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+                                $current_user = wp_get_current_user();
+                                $query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
 				$user_pledge = $wpdb->get_var($query);
-
+                                
 				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
 				if ($proj_finished){
 					if (is_user_logged_in()){		
@@ -169,7 +169,10 @@
 					}?>
 					<script>
 						document.getElementById("dbutton").addEventListener("click", thankyou);
-						function thankyou(){document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";}
+						function thankyou(){
+                                                        if(document.getElementById("pledge").value != '')
+                                                        document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";
+                                                }
 					</script>
 					<br><hr></div>
 				<br><h5>PLEDGERS' LIST</h5>

@@ -10,10 +10,6 @@
 	if(!IsSet($_SERVER['HTTP_REFERER'])){
 		$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
 		if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
-		echo "HOWDY, PLEDGER :D NOW YOU SEE ME, NOW YOU DON'T ;D";
-		echo "<br><br><br><br>WOAHHHHHHHHHHH WHY ARE YOU ACCESSING THISZZZZZZZ!!?!?!";
-		echo "<br><br>죽을래요?";
-		echo "<br><br><br><br>Bye~~~~";
 		header('Location: '.$hostlink);
 	}else {
 		$proj_title = htmlspecialchars($_POST['proj_title']);
