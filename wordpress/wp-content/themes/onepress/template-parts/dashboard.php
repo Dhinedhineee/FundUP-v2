@@ -72,7 +72,7 @@
 						if ($pledged) {
 							echo '<table class="projects">';
 							foreach ($pledged as $project) {
-								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_id'].'">'.$project['proj_title'].'</a></td><td class="money">Amount pledged: P'.$project['fund_given'].'</td>';
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_ID'].'">'.$project['proj_title'].'</a></td><td class="money">Amount pledged: P'.$project['fund_given'].'</td>';
 								if ($project['user_comment']) {
 									echo '<td class="comment">Comment: '.$project['user_comment'].'</td></tr>';
 								} else {
