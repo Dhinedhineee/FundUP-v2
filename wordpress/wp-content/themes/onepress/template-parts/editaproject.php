@@ -103,7 +103,7 @@
 				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.$proj_info.'</textarea>
 				<span id="infoalert"></span></span> </label></p>
 	
-		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
+		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
 		<span id="tierstiers">
 			<table id="tierstable" style="width:auto;">'.$projtiers.'</table>		
 		</span><span id="tieralert"></span></label>
@@ -125,7 +125,7 @@
 	if(document.getElementById("tierstable").childElementCount == 1)
 		tier = document.getElementById("tierstable").childNodes[0].childElementCount;
 	else tier = 0;
-	limit = 5;
+	limit = 10;
 
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
@@ -159,8 +159,8 @@
 		a = removetier.parentNode.parentNode;
 		a.parentNode.removeChild(a);
 		tier--;	
-		if(tier==4)		addtierbutton();
-		if(tier==0)		removetierheader(removetier);
+		if(tier==limit-1)		addtierbutton();
+		if(tier==0)				removetierheader(removetier);
 	}
 
 	function removetierheader(){

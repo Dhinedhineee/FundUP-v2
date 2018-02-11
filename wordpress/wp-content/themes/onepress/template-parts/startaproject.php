@@ -49,7 +49,7 @@
 	<textarea name="proj-info" id="proj-info" cols="40" rows="10" required></textarea>
 	<span id="infoalert"></span></label></p>
 	
-	<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
+	<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
 		<Span id="tierstiers">
 			<table id="tierstable" style="width:auto;"></table>		
 		</span><span id="tieralert"></span></label>
@@ -65,7 +65,7 @@
 
 <script>
 	tier = 0;
-	limit = 5;
+	limit = 10;
 
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
@@ -99,7 +99,7 @@
 		a = removetier.parentNode.parentNode;
 		a.parentNode.removeChild(a);
 		tier--;	
-		if(tier==4)		addtierbutton();
+		if(tier==limit-1)		addtierbutton();
 		if(tier==0)		removetierheader(removetier);
 	}
 
