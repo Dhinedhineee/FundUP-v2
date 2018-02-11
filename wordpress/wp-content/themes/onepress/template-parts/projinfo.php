@@ -124,8 +124,9 @@
 				<div id="donatewidget">
 				<?php
 				global $user_tier, $user_pledge;
-                                $current_user = wp_get_current_user();
-                                $query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+                $current_user = wp_get_current_user();
+                if(is_user_logged_in() and wp_get_current_user()->ID != $proj_user_ID){
+                $query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
 				$user_pledge = $wpdb->get_var($query);
                                 
 				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
@@ -161,9 +162,10 @@
   								<button class='btn btn-secondary-outline btn-lg' type='submit' id='dbutton' style='background-color:#7b1113; color:white;'>Donate!</button>
 							</div></form>
 							<p id='ptcontainer'></p>";
-					}?>
+					}}?>
 					<script>
-						document.getElementById("dbutton").addEventListener("click", thankyou);
+						if (document.getElementById("dbutton") != null)
+							document.getElementById("dbutton").addEventListener("click", thankyou);
 						function thankyou(){
                                                         if(document.getElementById("pledge").value != '')
                                                         document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";
