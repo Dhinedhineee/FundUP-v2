@@ -24,13 +24,12 @@
 		} else {
 			$proj_title = $result['proj_title'];
 			$proj_user = $result['proj_user'];
-			$proj_user_ID = $result['proj_user_ID'];
 			$proj_goal = $result['proj_goal'];
 			$proj_deadline = $result['proj_deadline'];
 			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
 			$proj_image = $result['proj_image'];
 			$proj_info = $result['proj_info'];
-			$user_ID = $result['proj_user_ID'];
+			$proj_user_ID = $result['proj_user_ID'];
 			$proj_finished = 1;
 		}
 	$proj_info = str_replace("\n", "<br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
@@ -41,7 +40,7 @@
 	echo onepress_breadcrumb();
 ?>
 
-<link rel="stylesheet" type="text/css" href="../wp-content/themes/onepress/assets/css/projstyles.css?ver=<?phpphp echo rand(111,999)?>">
+<link rel="stylesheet" type="text/css" href="../wp-content/themes/onepress/assets/css/projstyles.css?ver=<?php echo rand(111,999)?>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
 	<div id="goal">		
@@ -49,7 +48,7 @@
 			<?php
 				if(IsSet($proj_title))	echo "<p><h2>$proj_title</h2></p>";
 				else 					echo "<h2>Project name not found</h2>";
-				if(IsSet($proj_user))	echo "<p><h4>by <a href='".$hostlink."/user-profile/?view=$user_ID' style='color:#7b1113;' >$proj_user</a></h4></p>";
+				if(IsSet($proj_user))	echo "<p><h4>by <a href='".$hostlink."/user-profile/?view=$proj_user_ID' style='color:#7b1113;' >$proj_user</a></h4></p>";
 				else 					echo "<p><h4>User not found</h4></p>";
 				if(IsSet($proj_image)){
 					$imgloc = $hostlink."/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
@@ -170,20 +169,23 @@
                                                         document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";
                                                 }
 					</script>
-					<br><hr></div>
-				<br><h5>PLEDGERS' LIST</h5>
-				<ul><?php
-						$pledgecount = 0;
-						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id';", ARRAY_A);
-						if(IsSet($result))
-							foreach ($result as $list) {
-								$pledgecount++;
-								$pledger = $list['user'];
-								$pledge_amount = $list['fund_given']; 
-								echo '<li>'.$pledger.' - P'.number_format($pledge_amount).'</li> ';
-							}					
-						if(!$pledgecount) echo "<p>No pledgers yet. Be the first to pledge!</p>";
-				?></ul>
+					<br></div>
+				<?php
+					$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id'", ARRAY_A);
+					if (is_user_logged_in() and wp_get_current_user()->ID == $proj_user_ID){
+						echo "<hr><br><h5>PLEDGERS' LIST</h5>";
+						echo "<ul>";
+								$pledgecount = 0;
+								if(IsSet($result))
+									foreach ($result as $list) {
+										$pledgecount++;
+										$pledger = $list['user'];
+										$pledge_amount = $list['fund_given']; 
+										echo '<li>'.$pledger.' - P'.number_format($pledge_amount).'</li> ';
+									}					
+								if(!$pledgecount) echo "<p>No pledgers yet.</p>";
+						echo "</ul>";
+				}?>
 			</div>
 		</div>
 		
