@@ -24,7 +24,7 @@
 	//$user_image = $wpdb->get_var("SELECT filepath FROM wp_wfu_log WHERE userid=$user_ID");
 
 	$projects = $wpdb->get_results("SELECT * FROM projects WHERE proj_user_ID='$user_ID'", ARRAY_A);
-	$pledged = $wpdb->get_results("SELECT * FROM user_actions WHERE user_ID='$user_ID'", ARRAY_A);
+	$pledged = $wpdb->get_results("SELECT * FROM proj_pledges WHERE user_ID='$user_ID'", ARRAY_A);
 
 	get_header();
 	$layout = onepress_get_layout();
@@ -73,7 +73,7 @@
 							echo '<table class="projects">';
 							foreach ($pledged as $project) {
 								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_ID'].'">'.$project['proj_title'].'</a></td><td class="money">Amount pledged: P'.$project['fund_given'].'</td>';
-								if ($project['user_comment']) {
+								if (IsSet($project['user_comment'])) {
 									echo '<td class="comment">Comment: '.$project['user_comment'].'</td></tr>';
 								} else {
 									echo '<td class="comment">You did not comment on this pledge.</td></tr>';
