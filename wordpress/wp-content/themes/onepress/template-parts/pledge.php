@@ -20,7 +20,7 @@
 		#$result = $wpdb->get_row("SELECT * FROM projects WHERE proj_title='$proj_title'", ARRAY_A);
 		$result = $wpdb->get_row("SELECT * FROM projects WHERE proj_id='$proj_ID'", ARRAY_A);
 		#$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_title='$proj_title'");
-		$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM proj_pledges WHERE proj_ID='$proj_ID'");
+		$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_ID'");
 		$proj_fund = $proj_fund + $pledge_amount;
 		$wpdb->update('projects', array('proj_fund' => $proj_fund), array( 'proj_ID' => $proj_ID ));
 		
@@ -28,34 +28,34 @@
 		$pledger = $current_user->display_name;
 		$pledger_ID = $current_user->ID;
 
+				
+		$pledged = $wpdb->get_row("SELECT * FROM user_actions WHERE user_ID='$pledger_ID' AND proj_ID='$proj_ID'", ARRAY_A);
 		
-		if(!empty($user_comment))
-			$wpdb->insert('proj_comments', 
+
+		if(empty($pledged)){
+			$wpdb->insert('user_actions', 
       			array(
       					'user' => $pledger,
       					'user_ID' => $pledger_ID,
+      					'proj_title' => $proj_title,
       					'proj_ID' => $proj_ID,
+      					'fund_given' => $pledge_amount,
       					'user_comment' => $user_comment
       				)
       			);
-		
-		$pledged = $wpdb->get_results("SELECT * FROM proj_pledges WHERE user_ID='$pledger_ID' AND proj_ID='$proj_ID'");
-		if(empty($pledged)){
-			$wpdb->insert('proj_pledges', 
-      			array(
-      					'user' => $pledger,
-      					'user_ID' => $pledger_ID,
-      					'proj_ID' => $proj_ID,
-      					'proj_title' => $proj_title,
-      					'fund_given' => $pledge_amount
-      				));
 		}
 		else{
+			$action_date = $pledged['action_date'];
+			if($user_comment == '')		$user_comment = $pledged['user_comment'];
+			else if ($pledged['user_comment'] != $user_comment){
+				date_default_timezone_set('Asia/Manila');
+				$action_date = date('Y/m/d H:i:s', time());
+			}
 			if ($pledge_amount == 0)
-				$wpdb->delete('proj_pledges', array('user_ID' => $pledger_ID, 'proj_ID' => $proj_ID));
+				$wpdb->delete('user_actions', array('user_ID' => $pledger_ID, 'proj_ID' => $proj_ID));
 			else
-				$wpdb->update('proj_pledges', 
-  					array('fund_given' => $pledge_amount),
+				$wpdb->update('user_actions', 
+  					array('fund_given' => $pledge_amount, 'user_comment' => $user_comment, 'action_date' => $action_date),
   					array('user_ID' => $pledger_ID, 'proj_ID' => $proj_ID));
 		}
 			
@@ -63,3 +63,5 @@
 	}
 	die();
 ?>
+
+

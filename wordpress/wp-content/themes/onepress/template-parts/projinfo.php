@@ -26,7 +26,7 @@
 			$proj_user = $result['proj_user'];
 			$proj_goal = $result['proj_goal'];
 			$proj_deadline = $result['proj_deadline'];
-			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM proj_pledges WHERE proj_ID='$proj_id'");
+			$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_id'");
 			$proj_image = $result['proj_image'];
 			$proj_info = $result['proj_info'];
 			$proj_user_ID = $result['proj_user_ID'];
@@ -126,7 +126,7 @@
 				global $user_tier, $user_pledge;
                 $current_user = wp_get_current_user();
                 if(is_user_logged_in() and wp_get_current_user()->ID != $proj_user_ID){
-                $query = "SELECT fund_given FROM proj_pledges WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+                $query = "SELECT fund_given FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
 				$user_pledge = $wpdb->get_var($query);
                                 
 				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
@@ -146,14 +146,18 @@
 						<a href='".$hostlink."/login/'><strong>sign in</strong></a>.
 						</p>";
 				} else {
-					if($user_pledge){
+					$nopledge = 1;
+					$query = "SELECT * FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+					$result = $wpdb->get_row($query, ARRAY_A);
+					if($user_pledge != NULL){
+						$fund_given = $result['fund_given'];
 						echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P".number_format($user_pledge);
 						if($user_tier) echo " and have backed tier level $user_tier";
 						echo " in the project!</p>";
 						echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO CHANGE YOUR DONATION?</strong></p>";	
 						$nopledge = 0;
 					}
-					$pledgemin = "<input type='number' id='pledge' name='pledge_amount' min='".!isSet($nopledge)."' style='width:100%;' required>";
+					$pledgemin = "<input type='number' id='pledge' name='pledge_amount' min='".$nopledge."' style='width:100%;' required>";
 
 					echo "<form action='pledge-processing' method='post'>
 								<input type='hidden' name='proj_ID' value='$proj_id'>
@@ -180,7 +184,7 @@
 					if (is_user_logged_in() and wp_get_current_user()->ID == $proj_user_ID){
 						echo "<hr><br><h5>PLEDGERS' LIST</h5>";
 						echo "<ul>";
-						$result = $wpdb->get_results("SELECT * FROM proj_pledges WHERE proj_ID='$proj_id'", ARRAY_A);
+						$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id'", ARRAY_A);
 								$pledgecount = 0;
 								if(IsSet($result))
 									foreach ($result as $list) {
@@ -199,7 +203,7 @@
 			<hr><p style="color: #7b1113;">PLEDGERS' COMMENTS</p>
 			<?php
 				$commentcount = 0;
-				$result = $wpdb->get_results("SELECT * FROM proj_comments WHERE proj_ID='$proj_id'", ARRAY_A);
+				$result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id'", ARRAY_A);
 				if(IsSet($result)){
 					foreach ($result as $list) {
 						$user_comment = stripcslashes($list['user_comment']);
@@ -248,7 +252,7 @@
 		global $user_tier, $user_pledge;
 		$user_tier = 0;
 		$user_pledge = 0;
-		$query2 = "SELECT * FROM proj_pledges WHERE proj_id = $proj_id ORDER BY user_ID";
+		$query2 = "SELECT * FROM user_actions WHERE proj_id = $proj_id ORDER BY user_ID";
 		$results2 = $wpdb->get_results($query2);
 		if(sizeof($results2)){
 			$ctr = 0;
