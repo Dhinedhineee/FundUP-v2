@@ -69,7 +69,7 @@
 						    exit();
 						}
 
-						$query = "SELECT * FROM projects ORDER by proj_goal-proj_fund";
+						$query = "SELECT * FROM projects a JOIN wp_users b WHERE b.display_name = a.proj_user AND b.suspended = 0 ORDER by a.proj_goal-a.proj_fund";
 
 						if ($result = mysqli_query($link, $query)) {
 
