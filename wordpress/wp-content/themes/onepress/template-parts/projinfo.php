@@ -54,6 +54,7 @@
 					$imgloc = $hostlink."/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 					echo '<img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" >';
 				}
+
 				else 					echo '<img src ="#" alt="No image available for this project." id=\"contentimg\" >';
 				if(IsSet($proj_info))	echo "<p>".stripcslashes($proj_info)."</p>";
 				else 					echo "<p>Project information not found</p>";
@@ -68,9 +69,11 @@
 						echo "<td>";
 						echo "<p style='color:#7b1113; font-size: 20px;'>".'P '.number_format($results[$i]->proj_tier_amount)."</p>";
 						echo stripcslashes($results[$i]->proj_tier_desc);
-						echo "<br><br><p style='color:#7b1113;'>Backers: ";
-						echo (isSet($backernum[$i])) ? $backernum[$i]:0;
-						echo "</p></td>";	
+						echo "<br><br><p style='color:#7b1113;'>Backers: ".$backernum[$i]."<br>";
+						//echo (isSet($backernum[$i])) ? 
+						if ($results[$i]->proj_tier_slot != null) echo "Slots remaining: ".($results[$i]->proj_tier_slot-$backernum[$i])."</p>";
+						else echo "Unlimited slots available.</p>";
+						echo "</td>";	
 					}		
 					echo "</table></div>";
 				}
@@ -123,10 +126,8 @@
 			<div id="asidedonor">
 				<div id="donatewidget">
 			<?php
-				global $user_tier, $user_pledge;
-				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
-				
                 $current_user = wp_get_current_user();
+                if (!$proj_finished and $current_user->ID != $proj_user_ID) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
                 if (!is_user_logged_in() and !$proj_finished){
 					echo "<p style='text-transform:none; text-align:center; color:black;'>
 						You need to be a registered user to donate. Click here to 
@@ -135,35 +136,42 @@
 						</p>";
 				} 
                 else if(is_user_logged_in() and $current_user->ID != $proj_user_ID){
-	                $query = "SELECT fund_given FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
-					$user_pledge = $wpdb->get_var($query);
-
+	                //$query = "SELECT fund_given FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+	                global $tier_count;
+					$user_pledge = $wpdb->get_row("SELECT * FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'");
+					if(sizeof($user_pledge) != 0){
+						$user_pledge_amt = $user_pledge->fund_given;
+						$user_tier = usertierprint($user_pledge);
+						$user_tier_arr = usertier($user_pledge);
+					}
 					if ($proj_finished){
 						if (is_user_logged_in()){		
-							if(IsSet($user_pledge)){
-								echo "<br><hr><p style='text-align:center; font-size: 12px; text-transform:none;'>You had pledged P".number_format($user_pledge);
-								if(isSet($user_tier) && $user_tier) echo " and had backed tier level $user_tier";
+							if(sizeof($user_pledge) != 0){
+								echo "<br><hr><p style='text-align:center; font-size: 12px; text-transform:none;'>You had pledged P".number_format($user_pledge_amt);
+								if($user_tier != null) echo " and had backed tier $user_tier";
 								echo " in the project! Thank you for your support!</p>";
 							}
 						}
 					}else {
 						$nopledge = 1;
-						$query = "SELECT * FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
-						$result = $wpdb->get_row($query, ARRAY_A);
-						if($user_pledge != NULL){
-							$fund_given = $result['fund_given'];
-							echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P".number_format($user_pledge);
-							if($user_tier) echo " and have backed tier level $user_tier";
+						if(sizeof($user_pledge) != 0){
+							echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P".number_format($user_pledge_amt);
+							if($user_tier != null) echo " and had backed tier $user_tier";
 							echo " in the project!</p>";
 							echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO CHANGE YOUR DONATION?</strong></p>";	
 							$nopledge = 0;
 						}
-						$pledgemin = "<input type='number' id='pledge' name='pledge_amount' min='".$nopledge."' style='width:100%;' required>";
+						
+						$tier_array = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id = $proj_id ORDER BY proj_tier_amount", ARRAY_A);
+						$pledgemin = "<input type='number' id='pledge' name='pledge_amount' onkeyup='choosetiers()' min='".$nopledge."' style='width:100%;' required>";
+						$projtiers = chooseprojtiers($wpdb, $proj_id);
 
 						echo "<form action='pledge-processing' method='post'>
 									<input type='hidden' name='proj_ID' value='$proj_id'>
 									<input type='hidden' name='proj_title' value='$proj_title'>
+									<input type='hidden' name='proj_tier' value='".json_encode($user_tier_arr)."'>
 							        <label for='pledge'><strong>PLEDGE AMOUNT:</strong></label>".$pledgemin."
+							        <div id='choosetiers'>".$projtiers."</div>
 							        <br><label for='comment'><strong>ANY COMMENTS? (Optional)</strong></label>
 	        						<textarea id='comment' name='user_comment' style='width:100%;'></textarea>
 								<br><br>
@@ -172,16 +180,7 @@
 								</div></form>
 								<p id='ptcontainer'></p>";
 					}
-				}?>
-					<script>
-						if (document.getElementById("dbutton") != null)
-							document.getElementById("dbutton").addEventListener("click", thankyou);
-						function thankyou(){
-							pledgeval = document.getElementById("pledge").value
-                            if (pledgeval != '')
-                                document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";
-					</script>
-					<br></div>
+				}?><br></div>
 				<?php
 					if (is_user_logged_in() and wp_get_current_user()->ID == $proj_user_ID){
 						echo "<hr><br><h5>PLEDGERS' LIST</h5>";
@@ -250,51 +249,125 @@
 <br>
 
 <?php
-	function backersnum($results, $wpdb, $proj_id){
-		global $user_tier, $user_pledge;
-		$user_tier = 0;
-		$user_pledge = 0;
+
+	function backersnum($results, $wpdb, $proj_id){	
+		global $tier_count, $tierslots;
+		$results = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id = $proj_id ORDER BY proj_tier_amount");
+		
+		foreach($results as $tier)	$tierslots[] = $tier->proj_tier_slot;
+		
 		$query2 = "SELECT * FROM user_actions WHERE proj_id = $proj_id ORDER BY user_ID";
 		$results2 = $wpdb->get_results($query2);
+		$tier_count = (int)$wpdb->get_var("SELECT COUNT(*) FROM proj_tiers WHERE proj_id = $proj_id");
+		for ($i = 0; $i < $tier_count; $i++)	$backernum[$i] = 0;
+
 		if(sizeof($results2)){
-			$ctr = 0;
 			foreach($results2 as $pledger){
-				$check = 0;
-				if($ctr){
-					$ind = array_search($pledger->user_ID, array_column($backer, 'user_ID'));
-					if((!$ind && $backer[$ind]['user_ID'] == $pledger->user_ID) || $ind){
-						$backer[$ind]['pledge'] += $pledger->fund_given;
-							$check = 1;
-					}
+				if($pledger->proj_tier != null){
+					$pledged_tiers = json_decode($pledger->proj_tier);
+					for ($i = 0; $i < $tier_count; $i++)	
+						if ($pledged_tiers[$i] != 0){
+							$backernum[$i]++;
+							if($tierslots[$i] != null)	$tierslots[$i]--;
+						}
 				}
-				if(!$check)
-				{
-					$backer[$ctr]['user_ID'] = $pledger->user_ID;
-					$backer[$ctr]['pledge'] = $pledger->fund_given;
-					$ctr++;
-				}	
 			}
-			if (is_user_logged_in()){
-				$current_user = wp_get_current_user();
-				$query = "SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_id' AND user_ID='$current_user->ID'";
-				$user_pledge = $wpdb->get_var($query);
-				if(!IsSet($user_pledge)) 	$user_pledge = 0;
-			}
-			for ($i = 0; $i <= sizeof($results)-1; $i++){
-				$curr = $results[$i]->proj_tier_amount;
-				if($i != sizeof($results)-1)	$next = $results[$i+1]->proj_tier_amount;
-				else 							$next = 10000000000;
-				$backernum[$i] = sizeof(array_filter(array_column($backer, 'pledge'), function ($var) use ($curr, $next) {return ( $var >= $curr && $var < $next);}));
-				if(is_user_logged_in() && tierlevel($user_pledge, $curr, $next))		$user_tier = $i+1;
-			}	
 		}else return null;
 		return $backernum;
 	}
 
-	function tierlevel($var, $curr, $next){
-		return ($var >= $curr && $var < $next);
+	function usertier($user_pledge){
+		global $tier_count;
+		//$tier_count = $wpdb->get_var("SELECT COUNT(*) FROM proj_tiers WHERE proj_id = $proj_id");
+		if($user_pledge->proj_tier != null)				return json_decode($user_pledge->proj_tier);
+		else if ($tier_count == 0)						return null;
+		else for($i = 0; $i < $tier_count; $i++)		$user_tier[$i] = 0;
+		return $user_tier;
+	}
+
+	function usertierprint($user_pledge){
+		$pledged_tiers = usertier($user_pledge);
+		if($pledged_tiers == null)	return null;
+		$tierpledge = array_sum($pledged_tiers);
+		if($tierpledge == null)		return null;
+		$user_tier = 'level ';
+		if($tierpledge > 1)	$user_tier = 'levels ';
+		$tierctr = 0;
+		for($i = 0; $i < sizeof($pledged_tiers); $i++){
+			if($pledged_tiers[$i] != 0){
+				if($tierctr >= 1 && $tierpledge > 2) $user_tier .= ', ';
+				if($tierctr == $tierpledge-1 && $tierpledge != 1) $user_tier .= ' and ';
+				$user_tier .= $i+1;
+				$tierctr++;
+			}
+		}
+		return $user_tier;
+	}
+
+	function chooseprojtiers($wpdb, $proj_id){
+		global $tier_count, $tierslots;
+		$results = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id = $proj_id ORDER BY proj_tier_amount");
+		if(sizeof($results) != 0){
+			$projtiers = '<br><label for="pledge"><strong>CHOOSE A PROJECT TIER (OPTIONAL):</strong></label><div id="projecttiers">';
+			echo "<script>
+					window.tierslot = ".json_encode($tierslots)."
+				</script>";
+		}
+		for($i = 0; $i < sizeof($results); $i++){
+			$projtiers .= "<input type='hidden' class='proj-tier' onchange='tierchange()' name='proj-tier[".$i."]'value='".$results[$i]->proj_tier_amount."'><label for='proj_tier[".$i."]' >Tier Level ".($i+1)." (P ".number_format($results[$i]->proj_tier_amount).")</label><br>";
+		}
+		return $projtiers."</div>";
 	}
 ?>
+
+<script>
+	var pledgeval, tierlist, pledgeval2 = 0;
+	if (document.getElementById("dbutton") != null)	document.getElementById("dbutton").addEventListener("click", thankyou);
+
+	function thankyou(){
+		pledgeval = document.getElementById("pledge").value;
+        if (pledgeval != ''){
+        	document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";
+        	tierlist = document.getElementsByClassName("proj-tier");
+        	for (var i = 0; i < tierlist.length; i++){
+        		if(!tierlist[i].checked || tierlist[i].type=='hidden')	tierlist[i].value = 0;
+        		else 													tierlist[i].value = i+1;
+        	}
+        }
+    }
+
+    function choosetiers(){
+    	prevval = parseInt(document.getElementById("pledge").value);
+    	pledgeval = parseInt(document.getElementById("pledge").value);
+    	tiertitle = "<br><label for='pledge'><strong>CHOOSE A PROJECT TIER (OPTIONAL):</strong></label>";
+    	tierlist = document.getElementsByClassName("proj-tier");
+    	
+    	for (var i = 0; i < tierlist.length; i++){
+			if ((pledgeval-pledgeval2 >= parseInt(tierlist[i].value))|| (tierlist[i].checked && pledgeval >= parseInt(tierlist[i].value))){
+    			if(window.tierslot[i] != 0){
+		    		tierlist[i].type = 'checkbox';
+		    		tierlist[i].innerHTML = 'Tier Level ' + (i+1);
+	    		}
+    		}	
+    		else{
+    			tierlist[i].type = 'hidden';
+    			if(tierlist[i].checked){
+    				tierlist[i].checked = false;
+    				tierchange();
+    			}
+    		}
+    	}
+    }
+
+    function tierchange(){
+    	pledgeval2 = 0
+    	tierlist = document.getElementsByClassName("proj-tier");
+    	for (var i = 0; i < tierlist.length; i++)	if(tierlist[i].checked)	pledgeval2 += parseInt(tierlist[i].value);
+    	choosetiers();
+    }
+
+</script>
+
 <footer style="clear:both;display: block">
 	<?php get_footer();?>
 </footer>

@@ -16,6 +16,13 @@
 		$proj_ID = htmlspecialchars($_POST['proj_ID']);
 		$pledge_amount = htmlspecialchars($_POST['pledge_amount']);
 		$user_comment = htmlspecialchars($_POST['user_comment']);
+		$tier_count = $wpdb->get_var("SELECT COUNT(*) FROM proj_tiers WHERE proj_id = $proj_ID ORDER BY proj_tier_amount");
+		
+		for ($i = 0; $i < $tier_count; $i++)	$proj_tier[$i] = 0;
+		if (sizeof($_POST['proj-tier']) != 0)	foreach ($_POST['proj-tier'] as $i)		if($i != 0)	$proj_tier[$i-1] = 1;
+		
+		$proj_tier = json_encode($proj_tier);
+
 		global $wpdb;
 		#$result = $wpdb->get_row("SELECT * FROM projects WHERE proj_title='$proj_title'", ARRAY_A);
 		$result = $wpdb->get_row("SELECT * FROM projects WHERE proj_id='$proj_ID'", ARRAY_A);
@@ -40,6 +47,7 @@
       					'proj_title' => $proj_title,
       					'proj_ID' => $proj_ID,
       					'fund_given' => $pledge_amount,
+      					'proj_tier' => $proj_tier,
       					'user_comment' => $user_comment
       				)
       			);
@@ -55,7 +63,7 @@
 				$wpdb->delete('user_actions', array('user_ID' => $pledger_ID, 'proj_ID' => $proj_ID));
 			else
 				$wpdb->update('user_actions', 
-  					array('fund_given' => $pledge_amount, 'user_comment' => $user_comment, 'action_date' => $action_date),
+  					array('fund_given' => $pledge_amount, 'user_comment' => $user_comment, 'action_date' => $action_date, 'proj_tier' => $proj_tier,),
   					array('user_ID' => $pledger_ID, 'proj_ID' => $proj_ID));
 		}
 			

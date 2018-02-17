@@ -16,7 +16,7 @@
 	}
 ?>
 
-<?
+<?php
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
@@ -72,14 +72,16 @@
 				<main id="main" class="site-main" role="main">
 					<div class="entry-content"></div>
 
-<?
+<?php
 	global $wpdb;
 	$result = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id='$proj_ID';", ARRAY_A);
-	if(isset($result)){
-		$projtiers = '';
+	$projtiers = '';
+	if(sizeof($result) != 0){
+		$projtiers = '<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>';
 		foreach ($result as $tier) {
 			$projtiers = $projtiers.'<tr>
 			<td><input type="number" name="proj-tier[AMOUNT][]" value="'.$tier['proj_tier_amount'].'" required min="1"/></td>
+			<td><input type="number" name="proj-tier[SLOTS][]" value="'.$tier['proj_tier_slot'].'" /></td>
 			<td><textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1">'.stripcslashes($tier['proj_tier_desc']).'</textarea></td>
 			<td><a href="javascript:void(0);" onclick="remove(this)" id="remtier">Remove Tier</a></td>
 			</tr>';
@@ -143,13 +145,14 @@
 			var newtier;
 			if(tier == 0){
 				newtier = document.getElementById('tierstable').insertRow(tier);
-				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Description</th><th></th>"
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier</th><th>Tier Description</th><th></th>"
 			}
 			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
+			tierslot = '<input type="number" name="proj-tier[SLOTS][]">';
 			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
-			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
+			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
 			tier++;
 			if (tier==limit)	this.parentNode.removeChild(this);
 		} 

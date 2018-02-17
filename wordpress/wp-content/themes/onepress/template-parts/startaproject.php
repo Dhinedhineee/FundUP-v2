@@ -37,7 +37,7 @@
 	<p><label> Goal Amount<br>
 	<span class="goal-amount"><input type="number" required name="goal-amount" min="1"/></span></label></p>
 	
-	<?
+	<?php
 		$mindate = date_default_timezone_set('Asia/Manila');
 		$mindate = date('Y-m-d');
 		echo '
@@ -48,7 +48,7 @@
 	<p><label> Project Information<br>
 	<textarea name="proj-info" id="proj-info" cols="40" rows="10" required></textarea>
 	<span id="infoalert"></span></label></p>
-	
+
 	<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
 		<Span id="tierstiers">
 			<table id="tierstable" style="width:auto;"></table>		
@@ -83,11 +83,11 @@
 			var newtier;
 			if(tier == 0){
 				newtier = document.getElementById('tierstable').insertRow(tier);
-				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Description</th><th></th>"
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>"
 			}
 			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
-			tierslot = '<input type="number" name="proj-tier[SLOT][]">';
+			tierslot = '<input type="number" name="proj-tier[SLOTS][]">';
 			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
 
@@ -164,5 +164,5 @@
 </div><!-- #content -->
 
 <footer style="clear:both;display: block">
-	<? get_footer();?>
+	<?php get_footer();?>
 </footer>
