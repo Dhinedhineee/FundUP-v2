@@ -122,55 +122,57 @@
 			<br>
 			<div id="asidedonor">
 				<div id="donatewidget">
-				<?php
+			<?php
 				global $user_tier, $user_pledge;
-                $current_user = wp_get_current_user();
-                if(is_user_logged_in() and wp_get_current_user()->ID != $proj_user_ID){
-                $query = "SELECT fund_given FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
-				$user_pledge = $wpdb->get_var($query);
-                                
 				if (!$proj_finished) echo '<br><hr><h2 class="widget-title">WANT TO DONATE?</h2><hr>';
-				if ($proj_finished){
-					if (is_user_logged_in()){		
-						if(IsSet($user_pledge)){
-							echo "<br><hr><p style='text-align:center; font-size: 12px; text-transform:none;'>You had pledged P".number_format($user_pledge);
-							if(isSet($user_tier) && $user_tier) echo " and had backed tier level $user_tier";
-							echo " in the project! Thank you for your support!</p>";
-						}
-					}
-				}
-				else if (!is_user_logged_in()){
+				
+                $current_user = wp_get_current_user();
+                if (!is_user_logged_in() and !$proj_finished){
 					echo "<p style='text-transform:none; text-align:center; color:black;'>
 						You need to be a registered user to donate. Click here to 
 						<a href='".$hostlink."/signup/'><strong>register</strong></a> or 
 						<a href='".$hostlink."/login/'><strong>sign in</strong></a>.
 						</p>";
-				} else {
-					$nopledge = 1;
-					$query = "SELECT * FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
-					$result = $wpdb->get_row($query, ARRAY_A);
-					if($user_pledge != NULL){
-						$fund_given = $result['fund_given'];
-						echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P".number_format($user_pledge);
-						if($user_tier) echo " and have backed tier level $user_tier";
-						echo " in the project!</p>";
-						echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO CHANGE YOUR DONATION?</strong></p>";	
-						$nopledge = 0;
-					}
-					$pledgemin = "<input type='number' id='pledge' name='pledge_amount' min='".$nopledge."' style='width:100%;' required>";
+				} 
+                else if(is_user_logged_in() and $current_user->ID != $proj_user_ID){
+	                $query = "SELECT fund_given FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+					$user_pledge = $wpdb->get_var($query);
 
-					echo "<form action='pledge-processing' method='post'>
-								<input type='hidden' name='proj_ID' value='$proj_id'>
-								<input type='hidden' name='proj_title' value='$proj_title'>
-						        <label for='pledge'><strong>PLEDGE AMOUNT:</strong></label>".$pledgemin."
-						        <br><label for='comment'><strong>ANY COMMENTS? (Optional)</strong></label>
-        						<textarea id='comment' name='user_comment' style='width:100%;'></textarea>
-							<br><br>
-						    <div style='text-align:center;'>
-  								<button class='btn btn-secondary-outline btn-lg' type='submit' id='dbutton' style='background-color:#7b1113; color:white;'>Donate!</button>
-							</div></form>
-							<p id='ptcontainer'></p>";
-					}}?>
+					if ($proj_finished){
+						if (is_user_logged_in()){		
+							if(IsSet($user_pledge)){
+								echo "<br><hr><p style='text-align:center; font-size: 12px; text-transform:none;'>You had pledged P".number_format($user_pledge);
+								if(isSet($user_tier) && $user_tier) echo " and had backed tier level $user_tier";
+								echo " in the project! Thank you for your support!</p>";
+							}
+						}
+					}else {
+						$nopledge = 1;
+						$query = "SELECT * FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
+						$result = $wpdb->get_row($query, ARRAY_A);
+						if($user_pledge != NULL){
+							$fund_given = $result['fund_given'];
+							echo "<p style='text-align:center; font-size: 12px; text-transform:none;'>You currently have pledged P".number_format($user_pledge);
+							if($user_tier) echo " and have backed tier level $user_tier";
+							echo " in the project!</p>";
+							echo "<p style='text-align:center; font-size:13px; text-transform:none;'><strong>WANT TO CHANGE YOUR DONATION?</strong></p>";	
+							$nopledge = 0;
+						}
+						$pledgemin = "<input type='number' id='pledge' name='pledge_amount' min='".$nopledge."' style='width:100%;' required>";
+
+						echo "<form action='pledge-processing' method='post'>
+									<input type='hidden' name='proj_ID' value='$proj_id'>
+									<input type='hidden' name='proj_title' value='$proj_title'>
+							        <label for='pledge'><strong>PLEDGE AMOUNT:</strong></label>".$pledgemin."
+							        <br><label for='comment'><strong>ANY COMMENTS? (Optional)</strong></label>
+	        						<textarea id='comment' name='user_comment' style='width:100%;'></textarea>
+								<br><br>
+							    <div style='text-align:center;'>
+	  								<button class='btn btn-secondary-outline btn-lg' type='submit' id='dbutton' style='background-color:#7b1113; color:white;'>Donate!</button>
+								</div></form>
+								<p id='ptcontainer'></p>";
+					}
+				}?>
 					<script>
 						if (document.getElementById("dbutton") != null)
 							document.getElementById("dbutton").addEventListener("click", thankyou);
