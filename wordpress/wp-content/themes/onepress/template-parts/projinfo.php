@@ -171,7 +171,8 @@
 						
 						$tier_array = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id = $proj_id ORDER BY proj_tier_amount", ARRAY_A);
 						$pledgemin = "<input type='number' id='pledge' name='pledge_amount' onkeyup='choosetiers()' min='".$nopledge."' style='width:100%;' required>";
-						$projtiers = chooseprojtiers($wpdb, $proj_id);
+						$projtiers='';
+						if(sizeof($tier_array) != 0)	$projtiers = chooseprojtiers($wpdb, $proj_id);
 
 						echo "<form action='pledge-processing' method='post'>
 									<input type='hidden' name='proj_ID' value='$proj_id'>
