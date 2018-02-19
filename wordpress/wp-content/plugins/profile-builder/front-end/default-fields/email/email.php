@@ -111,3 +111,19 @@ function wppb_userdata_add_email( $userdata, $global_request ){
 	return $userdata;
 }
 add_filter( 'wppb_build_userdata', 'wppb_userdata_add_email', 10, 2 );
+
+/*
+  * Allow certain email domains to register
+  */
+  
+ function wppb_check_email_domain( $message, $field, $request_data, $form_location ){
+    $list_of_allowed_domains = array( 'up.edu.ph' );
+    //$domain = array_pop(explode('@', $request_data['email']));
+    $domain = substr(strrchr($request_data['email'], "@"), 1);
+    if ( !in_array( $domain, $list_of_allowed_domains) ) {
+       return __( 'The email domain you entered is not allowed on this website. Please try with a different email address.', 'profilebuilder' );
+    }
+  
+    return $message;
+ }
+ add_filter( 'wppb_check_form_field_default-e-mail', 'wppb_check_email_domain', 20, 4 ); 

@@ -59,8 +59,31 @@
 											<td class="name">
 												'.$user['display_name'].'
 											</td>
+											<td class="name">';
+
+											if ($user['suspended'] == 1) {
+												echo '[Suspended]';
+											}
+
+									echo '	</td>
+											<td class="options">';
+
+											if ($user['suspended'] == 0) {
+												echo '<a href="http://localhost/wordpress/user-profile/?view=' .$user['ID']. '">[View]</a>';
+											}
+												
+									echo '	</td>
 											<td class="options">
-												<a href="http://localhost/wordpress/user-profile/?view=' .$user['ID']. '">[View]</a>
+												<form method="post" action="/wordpress/wp-content/themes/onepress/template-parts/suspend.php">
+													<input type="hidden" name="ID" value="'.$user['ID'].'" />';
+
+													if ($user['suspended'] == 0) {
+														echo '<input type="hidden" name="type" value="suspend" /><input type="submit" value="[Suspend]" />';
+													} else {
+														echo '<input type="hidden" name="type" value="unsuspend" /><input type="submit" value="[Unsuspend]" />';
+													}
+													
+									echo		'</form>
 											</td>
 											<td class="options">
 												<form method="post" action="/wordpress/wp-content/themes/onepress/template-parts/delete.php">
