@@ -75,9 +75,11 @@
 						echo "<td>";
 						echo "<p style='color:#7b1113; font-size: 20px;'>".'P '.number_format($results[$i]->proj_tier_amount)."</p>";
 						echo stripcslashes($results[$i]->proj_tier_desc);
-						echo "<br><br><p style='color:#7b1113;'>Backers: ".$backernum[$i]."<br>";
+						if($backernum[$i] == null) 		$numbacker = 0;
+						else 							$numbacker = $backernum[$i];
+						echo "<br><br><p style='color:#7b1113;'>Backers: ".$numbacker."<br>";
 						//echo (isSet($backernum[$i])) ? 
-						if ($results[$i]->proj_tier_slot != null) echo "Slots remaining: ".($results[$i]->proj_tier_slot-$backernum[$i])."</p>";
+						if ($results[$i]->proj_tier_slot != null) echo "Slots remaining: ".($results[$i]->proj_tier_slot-$numbacker)."</p>";
 						else echo "Unlimited slots available.</p>";
 						echo "</td>";	
 					}		
