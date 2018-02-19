@@ -14,6 +14,10 @@
 
 	global $wpdb;
 	$info = $wpdb->get_row("SELECT * FROM wp_users WHERE ID=$user_ID", ARRAY_A);
+
+	if ($info['suspended'] == 1)
+		redirect('http://localhost/wordpress');
+
 	$info2 = $wpdb->get_row("SELECT meta_value FROM wp_usermeta WHERE user_id=$user_ID AND meta_key='description'", ARRAY_A);
 
 	if(!isset($info)){
@@ -80,3 +84,15 @@
 	</div>
 
 <?php get_footer(); ?>
+
+<?php 
+
+function redirect($url){
+		$string = '<script type="text/javascript">';
+	    $string .= 'window.location = "' . $url . '"';
+	    $string .= '</script>';
+	    echo $string;
+	    die();
+	}
+
+?>
