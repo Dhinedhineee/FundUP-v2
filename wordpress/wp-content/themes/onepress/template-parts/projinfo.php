@@ -34,6 +34,12 @@
 		}
 	$proj_info = str_replace("\n", "<br>", $proj_info);			//TEXT PARAGRAPH LAYOUT
 
+	#SUSPENDED ACCOUNT
+	$result = $wpdb->get_var("SELECT suspended FROM wp_users WHERE ID='$proj_user_ID'");
+	if($result){
+		header('Location: '.$hostlink);die();
+	}
+
 	#HEADER SETUP
 	get_header();
 	$layout = onepress_get_layout();
@@ -139,6 +145,7 @@
 	                //$query = "SELECT fund_given FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'";
 	                global $tier_count;
 					$user_pledge = $wpdb->get_row("SELECT * FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'");
+					$user_tier_arr = null;
 					if(sizeof($user_pledge) != 0){
 						$user_pledge_amt = $user_pledge->fund_given;
 						$user_tier = usertierprint($user_pledge);
@@ -192,7 +199,8 @@
 										$pledgecount++;
 										$pledger = $list['user'];
 										$pledge_amount = $list['fund_given']; 
-										echo '<li>'.$pledger.' - P'.number_format($pledge_amount).'</li> ';
+										$pledgerlink = "<a href='$hostlink/user-profile/?view=".$list['user_ID']."'style='color:#7b1113;' >$pledger</a>";
+										echo '<li>'.$pledgerlink.' - P'.number_format($pledge_amount).'</li> ';
 									}					
 								if(!$pledgecount) echo "<p>No pledgers yet.</p>";
 						echo "</ul>";

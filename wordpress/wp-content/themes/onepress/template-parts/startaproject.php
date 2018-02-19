@@ -8,7 +8,7 @@
 	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
 	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
 
-	if(!is_user_logged_in()){
+	if(!is_user_logged_in() || wp_get_current_user()->suspended){
 		header('Location: '.$hostlink);
 		die();
 	}

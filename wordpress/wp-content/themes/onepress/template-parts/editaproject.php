@@ -21,21 +21,26 @@
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
 	$url = $hostlink;
-		if(!isset($result)) 					redirect($url);
-		else {
-				$proj_title = stripcslashes($result['proj_title']);
-				$proj_goal = $result['proj_goal'];
-				$proj_user_ID = $result['proj_user_ID'];
-				$proj_info = stripcslashes($result['proj_info']);
-				$proj_user = wp_get_current_user()->display_name;
-                $current_user = wp_get_current_user();
-                $curr_user_ID = $current_user->ID;
-                if($proj_user_ID != $curr_user_ID)			redirect($url);
-				#HEADER SETUP
-				get_header();
-				$layout = onepress_get_layout();
-				echo onepress_breadcrumb();
-		}
+	
+	if(!isset($result)) 					redirect($url);
+	else {
+			$proj_title = stripcslashes($result['proj_title']);
+			$proj_goal = $result['proj_goal'];
+			$proj_user_ID = $result['proj_user_ID'];
+			$proj_info = stripcslashes($result['proj_info']);
+			$proj_user = wp_get_current_user()->display_name;
+            $current_user = wp_get_current_user();
+            $curr_user_ID = $current_user->ID;
+            if($proj_user_ID != $curr_user_ID)			redirect($url);
+			#SUSPENDED ACCOUNT
+			if($current_user->suspended)				redirect($url);
+	}
+
+	#HEADER SETUP
+	get_header();
+	$layout = onepress_get_layout();
+	echo onepress_breadcrumb();
+
 
 	function redirect($url){
 		$string = '<script type="text/javascript">';
