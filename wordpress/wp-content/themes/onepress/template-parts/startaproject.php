@@ -34,15 +34,20 @@
 	<span class="proj-name-field"><input type="text" required name="proj-name" size="40" id="proj-name"/>
 	<span id="titlealert"></span></span></label></p>
 
-	<p><label> Goal Amount<br>
-	<span class="goal-amount"><input type="number" required name="goal-amount" min="1"/></span></label></p>
+	<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
+	<span class="goal-amount"><input type="number" required name="goal-amount" id="goal-amount" min="10000" max="10000000"
+	 value="10000"/></span><br>
+	<span class="goal-amount"><input type="range" name="goal-range" id="goal-range" value="10000" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" oninput="goalchange(this.value)" onchange="slidechange(this.value)" required/>
+	</label></p>
+	
+				
 	
 	<?php
 		$mindate = date_default_timezone_set('Asia/Manila');
 		$mindate = date('Y-m-d');
 		echo '
 		<p><label> Project Deadline<br />
-		<input type="date" name="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'"/></span></label><span></span></p>';
+		<input type="date" name="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'" value="'.$mindate.'"/></span></label><span></span></p>';
 	?>
 
 	<p><label> Project Information<br>
@@ -69,6 +74,14 @@
 
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
+	}
+
+	function slidechange(newvalue){
+		document.getElementById("goal-range").value = newvalue;
+	}
+
+	function goalchange(newvalue){
+		document.getElementById("goal-amount").value = newvalue;
 	}
 
 	function addtierbutton(){

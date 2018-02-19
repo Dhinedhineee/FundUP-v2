@@ -100,8 +100,11 @@
 		    	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" value="'.$proj_title.'" aria-invalid="false" id="proj-name" required/>
 				<span id="titlealert"></span></span> </label></p>
 
-		<p><label> Goal Amount<br />
-				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1" required/></span></label><span>'.$fundtext.'</span></p>
+		<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
+				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" id="goal-amount" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" onkeyup="slidechange(this.value)" required/></span></br>	
+				<span class="wpcf7-form-control-wrap goal-amount"><input type="range" name="goal-range" id="goal-range" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" oninput="goalchange(this.value)"  onchange="slidechange(this.value)" required/>
+				</label><span>'.$fundtext.'</span></p>
+				
 		
 		<p><label> Project Deadline<br />
 					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$proj_deadline.'" min="'.$proj_deadline.'"/></span></label><span>'.$funddate.'</span></p>
@@ -136,6 +139,14 @@
 
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
+	}
+
+	function slidechange(newvalue){
+		document.getElementById("goal-range").value = newvalue;
+	}
+
+	function goalchange(newvalue){
+		document.getElementById("goal-amount").value = newvalue;
 	}
 
 	function addtierbutton(){
