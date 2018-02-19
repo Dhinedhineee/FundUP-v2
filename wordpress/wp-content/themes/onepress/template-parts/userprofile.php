@@ -61,7 +61,7 @@
 						if ($projects) {
 							echo '<table class="projects">';
 							foreach ($projects as $project) {
-								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_title'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_id'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
 							}
 							echo '</table>';
 						} else {
