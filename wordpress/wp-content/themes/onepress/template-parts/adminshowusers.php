@@ -66,9 +66,13 @@
 											}
 
 									echo '	</td>
-											<td class="options">
-												<a href="http://localhost/wordpress/user-profile/?view=' .$user['ID']. '">[View]</a>
-											</td>
+											<td class="options">';
+
+											if ($user['suspended'] == 0) {
+												echo '<a href="http://localhost/wordpress/user-profile/?view=' .$user['ID']. '">[View]</a>';
+											}
+												
+									echo '	</td>
 											<td class="options">
 												<form method="post" action="/wordpress/wp-content/themes/onepress/template-parts/suspend.php">
 													<input type="hidden" name="ID" value="'.$user['ID'].'" />';
