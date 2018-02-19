@@ -453,6 +453,20 @@ function update_tables($id, $data) {
 	);
 }
 
+add_action('wp_login', 'check_if_suspended', 10, 2);
+
+function check_if_suspended($login, $user) {
+	global $wpdb;
+	$user_ID = $user->ID;
+	$suspended = $wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=$user_ID");
+
+	if ($suspended == 1) {
+		wp_logout();
+		wp_safe_redirect( '/wordpress/suspended' );
+		exit;
+	}
+}
+
 function add_this_script_footer(){ ?>
  
     <script>
