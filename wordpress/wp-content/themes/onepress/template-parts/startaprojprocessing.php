@@ -30,7 +30,7 @@
 		<div id="primary" class="content-area">
 			<main id="main" class="site-main" role="main">
 
-<?
+<?php
 	/*
 	var_dump($_POST['proj-deadline']);
 	var_dump($_POST['proj-name']);
@@ -78,11 +78,14 @@
 	#################PROJECT TIERS HERE############################
 	if(IsSet($_POST['proj-tier']) && sizeof($_POST['proj-tier']['AMOUNT']) != 0){
 		for ($i = 0; $i < sizeof($_POST['proj-tier']['AMOUNT']); $i++){
+			$proj_tier_slot = null;
+			if(IsSet($_POST['proj-tier']['SLOTS'][$i]))	$proj_tier_slot = $_POST['proj-tier']['SLOTS'][$i];
 			$proj_tier_desc = htmlspecialchars($_POST['proj-tier']['TEXT'][$i]);
 			$wpdb->insert( 
 				'proj_tiers', 
 				array( 
 					'proj_ID' => $proj_ID,
+					'proj_tier_slot' => $proj_tier_slot,
 					'proj_tier_amount' => $_POST['proj-tier']['AMOUNT'][$i], 
 					'proj_tier_desc' => $proj_tier_desc
 				)
@@ -194,5 +197,5 @@
 
 <!-- #footer is not sent because of automatic redirection -->
 <footer style="clear:both;display: block">
-	<? get_footer();?>
+	<?php get_footer();?>
 </footer>

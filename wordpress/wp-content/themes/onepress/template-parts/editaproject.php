@@ -16,26 +16,31 @@
 	}
 ?>
 
-<?
+<?php
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
 	$url = $hostlink;
-		if(!isset($result)) 					redirect($url);
-		else {
-				$proj_title = $result['proj_title'];
-				$proj_goal = $result['proj_goal'];
-				$proj_user_ID = $result['proj_user_ID'];
-				$proj_info = $result['proj_info'];
-				$proj_user = wp_get_current_user()->display_name;
-                $current_user = wp_get_current_user();
-                $curr_user_ID = $current_user->ID;
-                if($proj_user_ID != $curr_user_ID)			redirect($url);
-				#HEADER SETUP
-				get_header();
-				$layout = onepress_get_layout();
-				echo onepress_breadcrumb();
-		}
+	
+	if(!isset($result)) 					redirect($url);
+	else {
+			$proj_title = stripcslashes($result['proj_title']);
+			$proj_goal = $result['proj_goal'];
+			$proj_user_ID = $result['proj_user_ID'];
+			$proj_info = stripcslashes($result['proj_info']);
+			$proj_user = wp_get_current_user()->display_name;
+            $current_user = wp_get_current_user();
+            $curr_user_ID = $current_user->ID;
+            if($proj_user_ID != $curr_user_ID)			redirect($url);
+			#SUSPENDED ACCOUNT
+			if($current_user->suspended)				redirect($url);
+	}
+
+	#HEADER SETUP
+	get_header();
+	$layout = onepress_get_layout();
+	echo onepress_breadcrumb();
+
 
 	function redirect($url){
 		$string = '<script type="text/javascript">';
@@ -72,14 +77,16 @@
 				<main id="main" class="site-main" role="main">
 					<div class="entry-content"></div>
 
-<?
+<?php
 	global $wpdb;
 	$result = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id='$proj_ID';", ARRAY_A);
-	if(isset($result)){
-		$projtiers = '';
+	$projtiers = '';
+	if(sizeof($result) != 0){
+		$projtiers = '<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>';
 		foreach ($result as $tier) {
 			$projtiers = $projtiers.'<tr>
 			<td><input type="number" name="proj-tier[AMOUNT][]" value="'.$tier['proj_tier_amount'].'" required min="1"/></td>
+			<td><input type="number" name="proj-tier[SLOTS][]" value="'.$tier['proj_tier_slot'].'" /></td>
 			<td><textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1">'.stripcslashes($tier['proj_tier_desc']).'</textarea></td>
 			<td><a href="javascript:void(0);" onclick="remove(this)" id="remtier">Remove Tier</a></td>
 			</tr>';
@@ -93,8 +100,11 @@
 		    	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" value="'.$proj_title.'" aria-invalid="false" id="proj-name" required/>
 				<span id="titlealert"></span></span> </label></p>
 
-		<p><label> Goal Amount<br />
-				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="1" required/></span></label><span>'.$fundtext.'</span></p>
+		<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
+				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" id="goal-amount" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" onkeyup="slidechange(this.value)" required/></span></br>	
+				<span class="wpcf7-form-control-wrap goal-amount"><input type="range" name="goal-range" id="goal-range" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" oninput="goalchange(this.value)"  onchange="slidechange(this.value)" required/>
+				</label><span>'.$fundtext.'</span></p>
+				
 		
 		<p><label> Project Deadline<br />
 					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$proj_deadline.'" min="'.$proj_deadline.'"/></span></label><span>'.$funddate.'</span></p>
@@ -103,7 +113,7 @@
 				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.$proj_info.'</textarea>
 				<span id="infoalert"></span></span> </label></p>
 	
-		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
+		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
 		<span id="tierstiers">
 			<table id="tierstable" style="width:auto;">'.$projtiers.'</table>		
 		</span><span id="tieralert"></span></label>
@@ -125,10 +135,18 @@
 	if(document.getElementById("tierstable").childElementCount == 1)
 		tier = document.getElementById("tierstable").childNodes[0].childElementCount;
 	else tier = 0;
-	limit = 5;
+	limit = 10;
 
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
+	}
+
+	function slidechange(newvalue){
+		document.getElementById("goal-range").value = newvalue;
+	}
+
+	function goalchange(newvalue){
+		document.getElementById("goal-amount").value = newvalue;
 	}
 
 	function addtierbutton(){
@@ -143,13 +161,14 @@
 			var newtier;
 			if(tier == 0){
 				newtier = document.getElementById('tierstable').insertRow(tier);
-				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Description</th><th></th>"
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier</th><th>Tier Description</th><th></th>"
 			}
 			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
+			tierslot = '<input type="number" name="proj-tier[SLOTS][]">';
 			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
-			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
+			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
 			tier++;
 			if (tier==limit)	this.parentNode.removeChild(this);
 		} 
@@ -159,8 +178,8 @@
 		a = removetier.parentNode.parentNode;
 		a.parentNode.removeChild(a);
 		tier--;	
-		if(tier==4)		addtierbutton();
-		if(tier==0)		removetierheader(removetier);
+		if(tier==limit-1)		addtierbutton();
+		if(tier==0)				removetierheader(removetier);
 	}
 
 	function removetierheader(){

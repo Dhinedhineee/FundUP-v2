@@ -23,7 +23,7 @@
 		<div id="primary" class="content-area">
 			<main id="main" class="site-main" role="main">
 	
-<?
+<?php
 	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
 	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
 
@@ -78,19 +78,20 @@
 
 	$wpdb->delete('proj_tiers', array( 'proj_ID' => $proj_ID ));
 	if(IsSet($_POST['proj-tier']['AMOUNT'])){
-		//var_dump($_POST['proj-tier']['TEXT']);
-		//var_dump($_POST['proj-tier']['AMOUNT']);
-	
+			
 		for ($i = 0; $i < sizeof($_POST['proj-tier']['AMOUNT']); $i++){
 			$proj_tier_desc = htmlspecialchars($_POST['proj-tier']['TEXT'][$i]);
+			$proj_tier_slot = null;
+			if(IsSet($_POST['proj-tier']['SLOTS'][$i]) and $_POST['proj-tier']['SLOTS'][$i] != '')	$proj_tier_slot = $_POST['proj-tier']['SLOTS'][$i];
+			
 			$wpdb->insert( 
 				'proj_tiers', 
 				array( 
 					'proj_ID' => $proj_ID,
+					'proj_tier_slot' => $proj_tier_slot,
 					'proj_tier_amount' => $_POST['proj-tier']['AMOUNT'][$i], 
 					'proj_tier_desc' => $proj_tier_desc
-				), 
-				array('%d','%d','%s') 
+				)
 			);		
 		}
 	}
@@ -186,5 +187,5 @@
 
 <!-- #footer is not sent because of automatic redirection -->
 <footer style="clear:both;display: block">
-	<? get_footer();?>
+	<?php get_footer();?>
 </footer>

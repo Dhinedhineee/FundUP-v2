@@ -8,7 +8,7 @@
 	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
 	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
 
-	if(!is_user_logged_in()){
+	if(!is_user_logged_in() || wp_get_current_user()->suspended){
 		header('Location: '.$hostlink);
 		die();
 	}
@@ -34,22 +34,27 @@
 	<span class="proj-name-field"><input type="text" required name="proj-name" size="40" id="proj-name"/>
 	<span id="titlealert"></span></span></label></p>
 
-	<p><label> Goal Amount<br>
-	<span class="goal-amount"><input type="number" required name="goal-amount" min="1"/></span></label></p>
+	<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
+	<span class="goal-amount"><input type="number" required name="goal-amount" id="goal-amount" min="10000" max="10000000"
+	 value="10000"/></span><br>
+	<span class="goal-amount"><input type="range" name="goal-range" id="goal-range" value="10000" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" oninput="goalchange(this.value)" onchange="slidechange(this.value)" required/>
+	</label></p>
 	
-	<?
+				
+	
+	<?php
 		$mindate = date_default_timezone_set('Asia/Manila');
 		$mindate = date('Y-m-d');
 		echo '
 		<p><label> Project Deadline<br />
-		<input type="date" name="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'"/></span></label><span></span></p>';
+		<input type="date" name="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'" value="'.$mindate.'"/></span></label><span></span></p>';
 	?>
 
 	<p><label> Project Information<br>
 	<textarea name="proj-info" id="proj-info" cols="40" rows="10" required></textarea>
 	<span id="infoalert"></span></label></p>
-	
-	<p><label>Project Tiers<label>[OPTIONAL] You can add at most 5 project tiers.<br>
+
+	<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
 		<Span id="tierstiers">
 			<table id="tierstable" style="width:auto;"></table>		
 		</span><span id="tieralert"></span></label>
@@ -65,10 +70,18 @@
 
 <script>
 	tier = 0;
-	limit = 5;
+	limit = 10;
 
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
+	}
+
+	function slidechange(newvalue){
+		document.getElementById("goal-range").value = newvalue;
+	}
+
+	function goalchange(newvalue){
+		document.getElementById("goal-amount").value = newvalue;
 	}
 
 	function addtierbutton(){
@@ -83,13 +96,15 @@
 			var newtier;
 			if(tier == 0){
 				newtier = document.getElementById('tierstable').insertRow(tier);
-				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Description</th><th></th>"
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>"
 			}
 			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
+			tierslot = '<input type="number" name="proj-tier[SLOTS][]">';
 			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
-			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
+
+			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
 			tier++;
 			if (tier==limit)	this.parentNode.removeChild(this);
 		} 
@@ -99,7 +114,7 @@
 		a = removetier.parentNode.parentNode;
 		a.parentNode.removeChild(a);
 		tier--;	
-		if(tier==4)		addtierbutton();
+		if(tier==limit-1)		addtierbutton();
 		if(tier==0)		removetierheader(removetier);
 	}
 
@@ -162,5 +177,5 @@
 </div><!-- #content -->
 
 <footer style="clear:both;display: block">
-	<? get_footer();?>
+	<?php get_footer();?>
 </footer>
