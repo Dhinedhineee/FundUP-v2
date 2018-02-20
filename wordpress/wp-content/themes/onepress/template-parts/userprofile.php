@@ -12,8 +12,16 @@
 	else
 		$user_ID = NULL;
 
+	if (gettype($user_ID) == "integer")
+		continue;
+	else
+		redirect('http://localhost/wordpress');
+
 	global $wpdb;
 	$info = $wpdb->get_row("SELECT * FROM wp_users WHERE ID=$user_ID", ARRAY_A);
+
+	if (!isset($info))
+		redirect('http://localhost/wordpress');
 
 	if ($info['suspended'] == 1)
 		redirect('http://localhost/wordpress');

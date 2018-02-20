@@ -1,5 +1,5 @@
 <?php
-	/*Template Name: Delete */
+	/*Template Name: Suspend */
 	/**
 	 * @link https://codex.wordpress.org/Template_Hierarchy
 	 *
