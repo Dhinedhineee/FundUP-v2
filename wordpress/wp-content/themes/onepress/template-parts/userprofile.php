@@ -12,10 +12,10 @@
 	else
 		$user_ID = NULL;
 
-	if (gettype($user_ID) == "integer")
-		continue;
-	else
-		redirect('http://localhost/wordpress');
+	if(!is_numeric($user_ID)) {
+		header('Location: http://localhost/wordpress');
+		die();
+	}	
 
 	global $wpdb;
 	$info = $wpdb->get_row("SELECT * FROM wp_users WHERE ID=$user_ID", ARRAY_A);
