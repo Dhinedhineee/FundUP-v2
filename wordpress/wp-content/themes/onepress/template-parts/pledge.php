@@ -19,7 +19,8 @@
 		$tier_count = $wpdb->get_var("SELECT COUNT(*) FROM proj_tiers WHERE proj_id = $proj_ID ORDER BY proj_tier_amount");
 		
 		for ($i = 0; $i < $tier_count; $i++)	$proj_tier[$i] = 0;
-		if (sizeof($_POST['proj-tier']) != 0)	foreach ($_POST['proj-tier'] as $i)		if($i != 0)	$proj_tier[$i-1] = 1;
+
+		if (isset($_POST['proj-tier']) && sizeof($_POST['proj-tier']) != 0)	foreach ($_POST['proj-tier'] as $i)		if($i != 0)	$proj_tier[$i-1] = 1;
 		
 		$proj_tier = json_encode($proj_tier);
 
@@ -38,7 +39,8 @@
 				
 		$pledged = $wpdb->get_row("SELECT * FROM user_actions WHERE user_ID='$pledger_ID' AND proj_ID='$proj_ID'", ARRAY_A);
 		
-
+		date_default_timezone_set('Asia/Manila');
+		$action_date = date('Y/m/d H:i:s', time());
 		if(empty($pledged)){
 			$wpdb->insert('user_actions', 
       			array(
@@ -48,7 +50,8 @@
       					'proj_ID' => $proj_ID,
       					'fund_given' => $pledge_amount,
       					'proj_tier' => $proj_tier,
-      					'user_comment' => $user_comment
+      					'user_comment' => $user_comment,
+      					'action_date' => $action_date
       				)
       			);
 		}
