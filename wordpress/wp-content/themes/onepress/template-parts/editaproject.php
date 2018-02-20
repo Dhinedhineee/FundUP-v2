@@ -92,8 +92,13 @@
 			</tr>';
 		}
 	}
-
-	echo'
+        
+        $currdate = date_default_timezone_set('Asia/Manila');
+        $currdate = date('Y-m-d');
+        $mindate = $proj_deadline;
+        if($currdate < $mindate) $mindate = $currdate;
+	
+        echo'
 		<form action="edit-project-processing" method="post" class="wpcf7-form demo" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
 		
 		<p><label> Project Name<br />
@@ -107,7 +112,7 @@
 				
 		
 		<p><label> Project Deadline<br />
-					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$proj_deadline.'" min="'.$proj_deadline.'"/></span></label><span>'.$funddate.'</span></p>
+					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" id="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$proj_deadline.'" min="'.$mindate.' max="2099-12-31"/></span></label><span>'.$funddate.'</span></p>
 
 		<p><label> Project Information<br />
 				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.$proj_info.'</textarea>
@@ -130,12 +135,28 @@
 		</form><br>
 	';
 ?>
-
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
 <script>
 	if(document.getElementById("tierstable").childElementCount == 1)
 		tier = document.getElementById("tierstable").childNodes[0].childElementCount;
 	else tier = 0;
 	limit = 10;
+        document.getElementById("proj-deadline").max = "2099-12-31";
+        
+        var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+        if(isSafari){
+                $('#proj-deadline').datepicker({
+                        dateFormat: 'dd-mm-yy',
+                        showButtonPanel: true,
+                        changeMonth: true,
+                        changeYear: true,
+                        yearRange: '2018:2100',
+                        minDate: new Date()
+                    });
+              $('#proj-deadline').prop('readonly', true);
+        }
 
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
@@ -161,7 +182,7 @@
 			var newtier;
 			if(tier == 0){
 				newtier = document.getElementById('tierstable').insertRow(tier);
-				newtier.innerHTML = "<th>Tier Amount</th><th>Tier</th><th>Tier Description</th><th></th>"
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>"
 			}
 			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';

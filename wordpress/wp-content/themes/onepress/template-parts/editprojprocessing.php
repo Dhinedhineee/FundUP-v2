@@ -37,7 +37,10 @@
 	$proj_goal = htmlspecialchars($_POST['goal-amount']);
 	$proj_info = htmlspecialchars($_POST['proj-info']);
 	$proj_ID = htmlspecialchars($_POST['proj-id']);
-
+        if(date_create_from_format('d-m-Y', $proj_deadline)){
+           $proj_deadline = date_create_from_format('d-m-Y', $proj_deadline);
+           $proj_deadline = date_format($proj_deadline, "Y-m-d");
+        }
 	global $wpdb, $current_user_name;
 	$current_user = wp_get_current_user();
 	$current_user_name = $current_user->display_name;
@@ -57,16 +60,6 @@
 		), 
 		array( 'proj_id' => $proj_ID, 'proj_user' => $current_user_name)
 	);
-
-	/*ARE PROJECT HAVING THE SAME NAMES ALLOWED?
-	if($proj_title != $origprojname){
-		//echo "NOT SAME";
-		$checkdup = $wpdb->get_var("SELECT * FROM projects WHERE proj_title='$proj_title'");
-		if(isset($checkdup)){
-			display("Sorry. Project name already taken!");
-			fileerror();
-		}
-	}*/
 
 	$wpdb->update( 
 		'projects', array( 'proj_title' => $proj_title ), array( 'proj_id' => $proj_ID )

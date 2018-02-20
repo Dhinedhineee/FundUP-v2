@@ -51,6 +51,10 @@
 	$proj_user_ID = $current_user->ID;
 	$proj_goal = htmlspecialchars($_POST['goal-amount']);
 	$proj_deadline = htmlspecialchars($_POST['proj-deadline']);
+        if(date_create_from_format('d-m-Y', $proj_deadline)){
+           $proj_deadline = date_create_from_format('d-m-Y', $proj_deadline);
+           $proj_deadline = date_format($proj_deadline, "Y-m-d");
+        }
 	$proj_info = htmlspecialchars($_POST['proj-info']);
 	//var_dump($_FILES['proj-image']);
 	fileupload();

@@ -16,7 +16,11 @@
 	get_header();
 	$layout = onepress_get_layout();
 ?>
+<head>
 
+
+
+</head>
 <div id="content" class="site-content">
 	<div class="page-header">
 		<div class="container">
@@ -47,7 +51,7 @@
 		$mindate = date('Y-m-d');
 		echo '
 		<p><label> Project Deadline<br />
-		<input type="date" name="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'" value="'.$mindate.'"/></span></label><span></span></p>';
+		<input type="date" name="proj-deadline" id="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'" value="'.$mindate.'"/></span></label><span></span></p>';
 	?>
 
 	<p><label> Project Information<br>
@@ -68,10 +72,26 @@
 	
 	</form><br>
 
-<script>
-	tier = 0;
-	limit = 10;
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
 
+<script>
+        tier = 0;
+	limit = 10;
+        document.getElementById("proj-deadline").max = "2099-12-31";
+        var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+        if(isSafari){
+                $('#proj-deadline').datepicker({
+                        dateFormat: 'dd-mm-yy',
+                        showButtonPanel: true,
+                        changeMonth: true,
+                        changeYear: true,
+                        yearRange: '2018:2100',
+                        minDate: new Date()
+                    });
+              $('#proj-deadline').prop('readonly', true);
+        }
 	window.onload=function(){
 		if(tier < limit)	addtierbutton();
 	}
@@ -171,7 +191,6 @@
 
 
 </script>
-
 			</main><!-- #main -->
 	</div><!--#content-inside -->
 </div><!-- #content -->

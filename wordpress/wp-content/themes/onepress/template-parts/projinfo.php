@@ -337,7 +337,7 @@
 
 	function thankyou(){
 		pledgeval = document.getElementById("pledge").value;
-        if (pledgeval != ''){
+        if (parseInt(pledgeval) > 0){
         	document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";
         	tierlist = document.getElementsByClassName("proj-tier");
         	for (var i = 0; i < tierlist.length; i++){
@@ -350,7 +350,7 @@
     function choosetiers(){
     	prevval = parseInt(document.getElementById("pledge").value);
     	pledgeval = parseInt(document.getElementById("pledge").value);
-    	tiertitle = "<br><label for='pledge'><strong>CHOOSE A PROJECT TIER (OPTIONAL):</strong></label>";
+    	tiertitle = "<br><label for='pledge'><strong>CHOOSE A PROJECT TIER (Optional):</strong></label>";
     	tierlist = document.getElementsByClassName("proj-tier");
     	
     	for (var i = 0; i < tierlist.length; i++){
