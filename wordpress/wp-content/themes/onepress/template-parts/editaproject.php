@@ -23,6 +23,7 @@
 	get_header();		#HEADER - PASSED ALL REDIRECTION TESTS
 
 	function redirect(){
+		global $hostlink;
 		header('Location: '.$hostlink);
 		die();
 	}

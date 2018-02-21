@@ -13,16 +13,18 @@
 	#DATABASE ACCESS
 	global $wpdb;
 	$proj_result = $wpdb->get_row("SELECT * FROM projects WHERE proj_id='$proj_id'", ARRAY_A);
-
-	if (!isset($proj_result))		redirect();
+	
+	if($proj_result == null)		redirect();
 	if ($wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=".$proj_result['proj_user_ID']))	redirect();
 
 	get_header();			#PASSED ALL REDIRECTION TESTS.
-
-	function redirect(){
+	
+    function redirect(){
+        global $hostlink;
 		header('Location: '.$hostlink);
 		die();
 	}
+
 ?>
 
 <?php
@@ -179,7 +181,7 @@
 				if ($user_tier != null) 	$pledgeinfodiv .= " and ".($proj_finished ? 'had':'have')." backed tier $user_tier";
 				$pledgeinfodiv .= " in the project!".($proj_finished ? " Thank you for your support.<hr>":"")."</p>";
 				if (!$proj_finished) 		$pledgeinfodiv .= "<p style='font-size:13px;'><strong>WANT TO CHANGE YOUR DONATION?</strong></p>";	
-			}else if (!is_user_logged_in())
+			}else if (!$proj_finished && !is_user_logged_in())
 				$pledgeinfodiv .= "<p style='color:black;'>
 					You need to be a registered user to donate. Click here to 
 					<a href='".$hostlink."/signup/'><strong>register</strong></a> or 

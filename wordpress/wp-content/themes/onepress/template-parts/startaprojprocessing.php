@@ -8,6 +8,7 @@
 	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
 
 	if(!IsSet($_SERVER['HTTP_REFERER'])){
+		global $hostlink;
 		//Unknown site access
 		header('Location: '.$hostlink);
 		die();
