@@ -68,6 +68,7 @@
 			<img src="<?= $proj_img_link?>" alt="Project image not found." id="contentimg">
 			<p><?= $proj_info?></p>
 			<div id="projtiers2"><?= $tierdiv?></div>
+			<hr>
 		</div>
 
 		<div id="sidebarprojinfo">
@@ -89,7 +90,7 @@
 		</div>
 		
 		<div id="projcomments">
-			<br><hr><p>PLEDGERS' COMMENTS</p>
+			<p>PLEDGERS' COMMENTS</p>
 			<?= $projcommentsdiv?>
 		</div>	
 	</div>
@@ -139,14 +140,14 @@
 			$dldiv .= "This project will end ".($deadline == 0 ? "today.":"in ".($deadline)." day".($deadline > 1 ? "s.":"."));
 			$proj_finished = 0;
 		}
-		else 	$dldiv .= "This project has ended ".($deadline == 0 ? "1 day ago.":(-1*$deadline)." days ago.");
+		else 	$dldiv .= "This project ended ".($deadline == 0 ? "1 day ago.":(-1*$deadline)." days ago.");
 		return $dldiv;
 	}
 
 	function project_pledgers(){
 		global $pledgers_result, $proj_id, $current_user, $proj_user_ID, $user_link;
 		if(is_user_logged_in() and $current_user->ID == $proj_user_ID){
-			$pledgerdiv = "<hr><br><h5>PLEDGERS' LIST</h5>";
+			$pledgerdiv = "<hr><h5>PLEDGERS' LIST</h5><hr>";
 			$pledgerdiv .= "<ul>";
 			$pledgecount = 0;
 			if(IsSet($pledgers_result))
@@ -158,7 +159,7 @@
 					$pledgerdiv .= '<li>'.$pledgerlink.' - P'.number_format($pledge_amount).'</li> ';
 				}					
 			if(!$pledgecount) $pledgerdiv .= "<p>No pledgers yet.</p>";
-			$pledgerdiv .= "</ul>";
+			$pledgerdiv .= "</ul><hr>";
 			return $pledgerdiv;
 		} else return '';
 	}
@@ -174,16 +175,16 @@
 				$user_pledge_amt = $userpledge_result->fund_given;
 				$user_tier = usertierprint($userpledge_result);
 				$user_tier_arr = usertier($userpledge_result);
-				$pledgeinfodiv .= "<p style='font-size: 12px;'>You had pledged P".number_format($user_pledge_amt);
-				if ($user_tier != null) 	$pledgeinfodiv .= " and had backed tier $user_tier";
-				$pledgeinfodiv .= " in the project!".($proj_finished ? "Thank you for your support.":"")."</p>";
+				$pledgeinfodiv .= "<p style='font-size: 12px;'>You ".($proj_finished ? 'had':'have')." pledged P".number_format($user_pledge_amt);
+				if ($user_tier != null) 	$pledgeinfodiv .= " and ".($proj_finished ? 'had':'have')." backed tier $user_tier";
+				$pledgeinfodiv .= " in the project!".($proj_finished ? " Thank you for your support.<hr>":"")."</p>";
 				if (!$proj_finished) 		$pledgeinfodiv .= "<p style='font-size:13px;'><strong>WANT TO CHANGE YOUR DONATION?</strong></p>";	
 			}else if (!is_user_logged_in())
 				$pledgeinfodiv .= "<p style='color:black;'>
 					You need to be a registered user to donate. Click here to 
 					<a href='".$hostlink."/signup/'><strong>register</strong></a> or 
 					<a href='".$hostlink."/login/'><strong>sign in</strong></a>.
-					</p>";
+					</p><hr>";
 		}
 		return $pledgeinfodiv;
 	}
@@ -207,7 +208,7 @@
 			    <div style='text-align:center;'>
 						<button class='btn btn-secondary-outline btn-lg' type='submit' id='dbutton' style='background-color:#7b1113; color:white;'>Donate!</button>
 				</div></form>
-				<p id='ptcontainer'></p>";
+				<p id='ptcontainer'></p><br><hr>";
 		}
 		return $pledgeformdiv;
 	}
@@ -242,7 +243,7 @@
 			}				
 		}	
 		if(!$commentcount){
-			$projcommentsdiv .= "<p style='padding-left:20px;'>";
+			$projcommentsdiv .= "<hr><p style='padding-left:20px; color: #777777'>";
 			if ($proj_finished) 	$projcommentsdiv .= "This project has no comments.</p>";
 			else   					$projcommentsdiv .= "No comments yet. Please pledge first to be able to leave comments!</p>";
 		}	
