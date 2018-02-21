@@ -71,7 +71,8 @@
     color: #7b1113;
 }
 
-#projcomments p {
+#projcomments p, #projtiers2 p {
+    color: #7b1113; 
     font-weight: 600;
     font-size: 18px;
 }
@@ -106,6 +107,21 @@
 #projtiers {
     text-align: center;
     vertical-align: top;
+}
+
+.maroon, #asidegoal b, #goal a, #pledgename {
+    color: #7b1113;
+}
+
+.amount {
+    float: right; 
+    letter-spacing: 2px; 
+    overflow-wrap: break-word;
+}
+
+#pledgeinfo p {
+    text-align: center; 
+    text-transform: none;
 }
 
 @media (max-width: 576px) {

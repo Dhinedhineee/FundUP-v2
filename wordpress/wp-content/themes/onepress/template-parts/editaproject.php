@@ -8,77 +8,45 @@
 	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
 	if($hostlink == 'http://localhost')	$hostlink .= '/wordpress';
 
-	if (isset($_GET['edit']))		
-		$proj_id = htmlspecialchars($_GET['edit']);
+	if (isset($_GET['edit']))		$proj_id = htmlspecialchars($_GET['edit']);
+	if(!is_numeric($proj_id))	redirect();
 
-	if(!is_numeric($proj_id)){
-		header('Location: '.$hostlink);die();
-	}
-?>
-
-<?php
 	global $wpdb;
 	$query = "SELECT * FROM projects WHERE proj_id='$proj_id'";
 	$result = $wpdb->get_row($query, ARRAY_A);
 	$url = $hostlink;
 	
-	if(!isset($result)) 					redirect($url);
-	else {
-			$proj_title = stripcslashes($result['proj_title']);
-			$proj_goal = $result['proj_goal'];
-			$proj_user_ID = $result['proj_user_ID'];
-			$proj_info = stripcslashes($result['proj_info']);
-			$proj_user = wp_get_current_user()->display_name;
-            $current_user = wp_get_current_user();
-            $curr_user_ID = $current_user->ID;
-            if($proj_user_ID != $curr_user_ID)			redirect($url);
-			#SUSPENDED ACCOUNT
-			if($current_user->suspended)				redirect($url);
+	if(!isset($result)) 								redirect();
+	if($result['proj_user_ID'] != $current_user->ID)	redirect();
+	if($current_user->suspended)						redirect();
+
+	get_header();		#HEADER - PASSED ALL REDIRECTION TESTS
+
+	function redirect(){
+		global $hostlink;
+		header('Location: '.$hostlink);
+		die();
 	}
+?>
 
-	#HEADER SETUP
-	get_header();
-	$layout = onepress_get_layout();
-	echo onepress_breadcrumb();
-
-
-	function redirect($url){
-		$string = '<script type="text/javascript">';
-	    $string .= 'window.location = "' . $url . '"';
-	    $string .= '</script>';
-	    echo $string;
-	    die();
-	}
-
-	
+<?php 	
+	$proj_title = stripcslashes($result['proj_title']);
+	$proj_goal = $result['proj_goal'];
+	$proj_user_ID = $result['proj_user_ID'];
+	$proj_info = stripcslashes($result['proj_info']);
+	$proj_user = wp_get_current_user()->display_name;
+    $current_user = wp_get_current_user();
+    $curr_user_ID = $current_user->ID;
 	$proj_deadline = $result['proj_deadline'];
 
-	if(isset($proj_deadline))	$funddate = "This project's current deadline is on ".date_format(date_create_from_format('Y-m-d', $proj_deadline), 'm-d-Y');
-	else{
-		$funddate = "This project's deadline has not been set.";
-		date_default_timezone_set('Asia/Manila');
-	}
+	$funddate = "This project's current deadline is on ".date_format(date_create_from_format('Y-m-d', $proj_deadline), 'm-d-Y');
 	$proj_ID = $result['proj_id'];
 	$proj_fund = $result['proj_fund'];
 	$fundtext = "This project's current fund pledged is P".number_format($proj_fund)."";
 	$proj_image = $result['proj_image'];
 	$imgloc = $hostlink."/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 	$imagetext = '<br><img src = "'. $imgloc.'" alt="'.$proj_image.'" id=\"contentimg\" width="50%"><br><br>';
-?>
 
-	<div id="content" class="site-content">
-		<div class="page-header">
-			<div class="container">
-				<h1 class="entry-title">Edit A Project</h1>			
-			</div>
-		</div>
-
-		<div id="content-inside" class="container no-sidebar">
-				<main id="main" class="site-main" role="main">
-					<div class="entry-content"></div>
-
-<?php
-	global $wpdb;
 	$result = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id='$proj_ID';", ARRAY_A);
 	$projtiers = '';
 	if(sizeof($result) != 0){
@@ -92,53 +60,76 @@
 			</tr>';
 		}
 	}
-        
-        $currdate = date_default_timezone_set('Asia/Manila');
-        $currdate = date('Y-m-d');
-        $mindate = $proj_deadline;
-        if($currdate < $mindate) $mindate = $currdate;
-	
-        echo'
-		<form action="edit-project-processing" method="post" class="wpcf7-form demo" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
-		
-		<p><label> Project Name<br />
-		    	<span class="wpcf7-form-control-wrap proj-name"><input type="text" name="proj-name" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" value="'.$proj_title.'" aria-invalid="false" id="proj-name" required/>
-				<span id="titlealert"></span></span> </label></p>
 
-		<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
-				<span class="wpcf7-form-control-wrap goal-amount"><input type="number" name="goal-amount" id="goal-amount" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" onkeyup="slidechange(this.value)" required/></span></br>	
-				<span class="wpcf7-form-control-wrap goal-amount"><input type="range" name="goal-range" id="goal-range" value="'.$proj_goal.'" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" oninput="goalchange(this.value)"  onchange="slidechange(this.value)" required/>
-				</label><span>'.$fundtext.'</span></p>
-				
-		
-		<p><label> Project Deadline<br />
-					<span class="wpcf7-form-control-wrap goal-amount"><input type="date" name="proj-deadline" id="proj-deadline" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" required value="'.$proj_deadline.'" min="'.$mindate.' max="2099-12-31"/></span></label><span>'.$funddate.'</span></p>
+    $currdate = date_default_timezone_set('Asia/Manila');
+    $currdate = date('Y-m-d');
+    $mindate = $proj_deadline;
+    if($currdate < $mindate) $mindate = $currdate;
+?>	
 
-		<p><label> Project Information<br />
-				<span class="wpcf7-form-control-wrap proj-info"><textarea name="proj-info" id="proj-info" cols="40" rows="10" class="wpcf7-form-control wpcf7-textarea wpcf7-validates-as-required" required aria-invalid="false">'.$proj_info.'</textarea>
-				<span id="infoalert"></span></span> </label></p>
-	
-		<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
-		<span id="tierstiers">
-			<table id="tierstable" style="width:auto;">'.$projtiers.'</table>		
-		</span><span id="tieralert"></span></label>
-		</label></p>
-		
-		<p><label> Current Project Photo
-		<span id="imageshow">'.$imagetext.'</span>
-		<p><label> Upload a new project photo(jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40"  class="wpcf7-form-control wpcf7-file wpcf7-validates-as-required" aria-required="true" aria-invalid="false" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br><span id="FileError"></span></span></label></p>
-		<span id="imgcontainer2"></span>
-		
-		<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-form-control wpcf7-submit" /></p>
-		<input type="hidden" name="proj-id" value="'.$proj_ID.'" />
-		<div id="submitted"></div>
+<div id="content" class="site-content">
+	<div class="page-header">
+		<div class="container">
+			<h1 class="entry-title">Edit A Project</h1>			
+		</div>
+	</div>
+
+	<div id="content-inside" class="container no-sidebar">
+		<main id="main" class="site-main" role="main">
+			<div class="entry-content"></div>
+
+		<form action="edit-project-processing" method="post" class="wpcf7-form" onSubmit="return submitted()" enctype="multipart/form-data" id="mainForm">
+			<p><label> Project Name<br />
+    		<span class="proj-name">
+    			<input type="text" name="proj-name" size="40" value="<?= $proj_title?>"id="proj-name" required/><span id="titlealert"></span>
+			</span></label></p>
+
+			<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
+			<span class="goal-amount">
+				<input type="number" name="goal-amount" id="goal-amount" value=<?= $proj_goal?> min="10000" max="10000000" onkeyup="slidechange(this.value)" required/></br>	
+				<input type="range" name="goal-range" id="goal-range" value=<?= $proj_goal?>  min="10000" max="10000000" oninput="goalchange(this.value)"  onchange="slidechange(this.value)" required/>
+			</span></label><span><?= $fundtext?></span></p>
+
+			<p><label> Project Deadline<br />
+			<span class="goal-deadline">
+				<input type="date" name="proj-deadline" id="proj-deadline" required value=<?= $proj_deadline?> min=<?= $mindate?> max="2099-12-31"/>
+			</span></label><span><?= $funddate?></span></p>
+
+			<p><label> Project Information<br />
+			<span class="proj-info">
+				<textarea name="proj-info" id="proj-info" cols="40" rows="10" required><?= $proj_info?></textarea>
+			</span><span id="infoalert"></span></label></p>
+
+			<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
+			<span id="tierstiers">
+				<table id="tierstable" style="width:auto;"><?= $projtiers?></table>		
+			</span><span id="tieralert"></span></label></label></p>
+
+			<p><label> Current Project Photo
+			<span id="imageshow"><?= $imagetext?></span>
+			<p><label> Upload a new project photo(jpg/jpeg/gif/png, max 7MB)<br>
+			<span class="proj-image"><input type="file" name="proj-image" id="proj-image" size="40"  accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)"/><br>
+			<span id="FileError"></span></span></label></p>
+			<span id="imgcontainer2"></span>
+			
+			<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-submit" /></p>
+			<input type="hidden" name="proj-id" value=<?= $proj_ID?>/>
+			<div id="submitted"></div>
 		</form><br>
-	';
-?>
+
+		</main><!-- #main -->
+	</div><!--#content-inside -->
+</div><!-- #content -->
+
+<footer style="clear:both;display: block">
+	<?php get_footer();?>
+</footer>
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
 <script>
+
 	if(document.getElementById("tierstable").childElementCount == 1)
 		tier = document.getElementById("tierstable").childNodes[0].childElementCount;
 	else tier = 0;
@@ -186,7 +177,7 @@
 			}
 			newtier = document.getElementById('tierstable').insertRow(tier);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
-			tierslot = '<input type="number" name="proj-tier[SLOTS][]">';
+			tierslot = '<input type="number" name="proj-tier[SLOTS][] min="0">';
 			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
 			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
@@ -232,14 +223,6 @@
 	
 	function submitted(){
 		var x = 0;
-		if (document.getElementById("proj-name").value == "" || document.getElementById("proj-name").value.replace(/\s+/g, '') == ""){
-			document.getElementById("titlealert").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">This field is required.</span>';
-			x = 1;
-		}else document.getElementById("titlealert").innerHTML = "";
-		if (document.getElementById("proj-info").value == "" || document.getElementById("proj-info").value.replace(/\s+/g, '') == ""){
-			document.getElementById("infoalert").innerHTML ='<span role="alert" class="wpcf7-not-valid-tip">This field is required.</span>';
-			x = 1;
-		}else document.getElementById("infoalert").innerHTML = "";
 		if (verifyMe() == "FileSize" || verifyMe() == "FileType" ){
 			x = 1;
 		}else document.getElementById("FileError").innerHTML = "";
@@ -252,11 +235,3 @@
 		}
 	}
 </script>
-
-			</main><!-- #main -->
-	</div><!--#content-inside -->
-</div><!-- #content -->
-
-<footer style="clear:both;display: block">
-	<?php get_footer();?>
-</footer>
