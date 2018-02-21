@@ -35,7 +35,7 @@
 	$proj_info = $proj_result['proj_info'];
 	$proj_user_ID = $proj_result['proj_user_ID'];
 	$proj_info = stripcslashes(str_replace("\n", "<br>", $proj_info));			//TEXT PARAGRAPH LAYOUT
-	$proj_user_link = $hostlink."/user-profile/?view=$proj_user_ID";
+	$user_link = $hostlink."/user-profile/?view=";
 	$proj_img_link = $hostlink."/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 
 	#DATABASE ACTIONS
@@ -48,6 +48,7 @@
 	#PROJECT PARTS TEXTS
     $proj_finished = 1;  
     $user_pledge_amt = 0;
+    $backernames = null;
 	$tierdiv = project_tiers();
 	$dldiv = project_deadline();
 	$pledgerdiv = project_pledgers();
@@ -63,7 +64,7 @@
 	<div id="goal">		
 		<div id="contentgoal">
 			<br><h2><?= $proj_title?></h2>
-			<h4>by <a href=<?= $proj_user_link?>><?= $proj_user?></a></h4>
+			<h4>by <a href=<?= $user_link.$proj_user_ID?>><?= $proj_user?></a></h4>
 			<img src="<?= $proj_img_link?>" alt="Project image not found." id="contentimg">
 			<p><?= $proj_info?></p>
 			<div id="projtiers2"><?= $tierdiv?></div>
@@ -98,10 +99,11 @@
 
 <?php
 	function project_tiers(){
-		global $tier_result, $proj_id;
+		global $tier_result, $proj_id, $current_user, $proj_user_ID, $backernames, $user_link;
 		if (sizeof($tier_result)){
 			$tierdiv = "<hr><p>PROJECT TIERS</p>";
-			$tierdiv .= "<div id='projtiers'><table><col width=25%><col width=40%><col width=35%>";
+			$tierdiv .= "<div id='projtiers'><table>";
+			$tierdiv .= "<col width=25%><col width=40%><col width=35%>";
 			$backernum = backersnum($tier_result, $proj_id);
 			for ($i = sizeof($tier_result)-1; $i >= 0; $i--){
 				$tierdiv .= "<tr>";
@@ -109,9 +111,15 @@
 				$tierdiv .= "<td style='padding: 0px;'>".stripcslashes($tier_result[$i]->proj_tier_desc)."</td>";
 				$numbacker = ($backernum[$i] == null ? 0:$backernum[$i]);
 				$tierdiv .= "<td class='maroon'>Backers: ".$numbacker."<br>";
+				
 				if (intval($tier_result[$i]->proj_tier_slot) != 0) $tierdiv .= "Slots remaining: ".($tier_result[$i]->proj_tier_slot-$numbacker);
-				else $tierdiv .= "Unlimited slots available.</td>";
-				$tierdiv .= "</tr>";	
+				else $tierdiv .= "Unlimited slots available.";
+
+				if ($current_user->ID == $proj_user_ID)
+					foreach ($backernames[$i] as $backerid => $backer)
+						$tierdiv .= '<li><a href='.$user_link.$backerid.'>'.$backer.'</a></li>';	
+
+				$tierdiv .= "</td></tr>";	
 			}		
 			$tierdiv .= "</table></div>";
 			return $tierdiv;
@@ -136,7 +144,7 @@
 	}
 
 	function project_pledgers(){
-		global $pledgers_result, $proj_id, $current_user, $proj_user_ID, $hostlink;
+		global $pledgers_result, $proj_id, $current_user, $proj_user_ID, $user_link;
 		if(is_user_logged_in() and $current_user->ID == $proj_user_ID){
 			$pledgerdiv = "<hr><br><h5>PLEDGERS' LIST</h5>";
 			$pledgerdiv .= "<ul>";
@@ -146,7 +154,7 @@
 					$pledgecount++;
 					$pledger = $list['user'];
 					$pledge_amount = $list['fund_given']; 
-					$pledgerlink = "<a href='$hostlink/user-profile/?view=".$list['user_ID']."'>$pledger</a>";
+					$pledgerlink = "<a href=".$user_link.$list['user_ID'].">$pledger</a>";
 					$pledgerdiv .= '<li>'.$pledgerlink.' - P'.number_format($pledge_amount).'</li> ';
 				}					
 			if(!$pledgecount) $pledgerdiv .= "<p>No pledgers yet.</p>";
@@ -243,19 +251,23 @@
 	}
 
 	function backersnum($results, $proj_id){	
-		global $tier_count, $tierslots, $tier_result, $pledgers_result;
+		global $tier_count, $tierslots, $tier_result, $pledgers_result, $backernames;
 		
 		foreach ($tier_result as $tier)		$tierslots[] = ($tier->proj_tier_slot == 0 ? null:$tier->proj_tier_slot);
-		for ($i = 0; $i < $tier_count; $i++)	$backernum[$i] = 0;
+		for ($i = 0; $i < $tier_count; $i++){
+			$backernum[$i] = 0;
+			$backernames[$i] = array();
+		}
 
 		if (sizeof($pledgers_result)){
 			for ($i = 0; $i < sizeof($pledgers_result); $i++){
 				if ($pledgers_result[$i] != null){
 					$pledged_tiers = json_decode($pledgers_result[$i]['proj_tier']);
-					for ($i = 0; $i < $tier_count; $i++)	
-						if ($pledged_tiers[$i] != 0){
-							$backernum[$i]++;
-							if($tierslots[$i] != null)	$tierslots[$i]--;
+					for ($j = 0; $j < $tier_count; $j++)	
+						if ($pledged_tiers[$j] != 0){
+							$backernames[$j][$pledgers_result[$i]['user_ID']] = $pledgers_result[$i]['user'];
+							$backernum[$j]++;
+							if($tierslots[$j] != null)	$tierslots[$j]--;
 						}
 				}
 			}
