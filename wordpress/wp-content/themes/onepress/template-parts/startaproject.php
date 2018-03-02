@@ -58,11 +58,11 @@
 	<textarea name="proj-info" id="proj-info" cols="40" rows="10" required></textarea>
 	<span id="infoalert"></span></label></p>
 
-	<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
-		<Span id="tierstiers">
+	<label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
+		<span id="tierstiers">
 			<table id="tierstable" style="width:auto;"></table>		
-		</span><span id="tieralert"></span></label>
-	</label></p>
+		</span></label>
+	</label>
 
 	<p><label> Project Photo<label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)" required/><br><span id="FileError"></span></span></label>	
 	</label></p>
@@ -105,26 +105,25 @@
 	}
 
 	function addtierbutton(){
-		addtier = '<a href="javascript:void(0)" id="addtiers">CLICK THIS TO ADD TIERS</a>';
+		addtier = '<a href="javascript:void(0)" id="addtiers">CLICK THIS TO ADD TIERS<br><br></a>';
 		a = document.getElementById("tierstiers").innerHTML;
-		document.getElementById("tierstiers").innerHTML = a + addtier;
+		document.getElementById("tierstiers").innerHTML = addtier + a;
 		document.getElementById("addtiers").onclick = addingtiers;
 	}
 
 	function addingtiers(){
 		if(tier < limit){
-			var newtier;
+			var newtier, header = '';
 			if(tier == 0){
-				newtier = document.getElementById('tierstable').insertRow(tier);
-				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>"
+				newtier = document.getElementById('tierstable').insertRow(0);
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>";
 			}
-			newtier = document.getElementById('tierstable').insertRow(tier);
+			newtier = document.getElementById('tierstable').insertRow(tier+1);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
-			tierslot = '<input type="number" name="proj-tier[SLOTS][]">';
+			tierslot = '<input type="number" name="proj-tier[SLOTS][]" min="0">';
 			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
-
-			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
+			newtier.innerHTML = "<tr><td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td></tr>";
 			tier++;
 			if (tier==limit)	this.parentNode.removeChild(this);
 		} 

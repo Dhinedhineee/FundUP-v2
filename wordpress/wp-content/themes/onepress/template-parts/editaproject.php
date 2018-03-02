@@ -54,7 +54,7 @@
 		foreach ($result as $tier) {
 			$projtiers = $projtiers.'<tr>
 			<td><input type="number" name="proj-tier[AMOUNT][]" value="'.$tier['proj_tier_amount'].'" required min="1"/></td>
-			<td><input type="number" name="proj-tier[SLOTS][]" value="'.$tier['proj_tier_slot'].'" /></td>
+			<td><input type="number" name="proj-tier[SLOTS][]" value="'.$tier['proj_tier_slot'].'" min="0"/></td>
 			<td><textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1">'.stripcslashes($tier['proj_tier_desc']).'</textarea></td>
 			<td><a href="javascript:void(0);" onclick="remove(this)" id="remtier">Remove Tier</a></td>
 			</tr>';
@@ -100,10 +100,10 @@
 				<textarea name="proj-info" id="proj-info" cols="40" rows="10" required><?= $proj_info?></textarea>
 			</span><span id="infoalert"></span></label></p>
 
-			<p><label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
+			<label>Project Tiers<label>[OPTIONAL] You can add at most 10 project tiers.<br>
 			<span id="tierstiers">
 				<table id="tierstable" style="width:auto;"><?= $projtiers?></table>		
-			</span><span id="tieralert"></span></label></label></p>
+			</span></label></label>
 
 			<p><label> Current Project Photo
 			<span id="imageshow"><?= $imagetext?></span>
@@ -113,7 +113,7 @@
 			<span id="imgcontainer2"></span>
 			
 			<p><input type="submit" id="submitbtn" value="Submit" class="wpcf7-submit" /></p>
-			<input type="hidden" name="proj-id" value=<?= $proj_ID?>/>
+			<input type="hidden" name="proj-id" value="<?= $proj_ID?>">
 			<div id="submitted"></div>
 		</form><br>
 
@@ -131,7 +131,7 @@
 <script>
 
 	if(document.getElementById("tierstable").childElementCount == 1)
-		tier = document.getElementById("tierstable").childNodes[0].childElementCount;
+		tier = document.getElementById("tierstable").childNodes[0].childElementCount-1;
 	else tier = 0;
 	limit = 10;
         document.getElementById("proj-deadline").max = "2099-12-31";
@@ -162,9 +162,9 @@
 	}
 
 	function addtierbutton(){
-		addtier = '<a href="javascript:void(0)" id="addtiers">CLICK THIS TO ADD TIERS</a>';
+		addtier = '<a href="javascript:void(0)" id="addtiers">CLICK THIS TO ADD TIERS<br><br></a>';
 		a = document.getElementById("tierstiers").innerHTML;
-		document.getElementById("tierstiers").innerHTML = a + addtier;
+		document.getElementById("tierstiers").innerHTML = addtier + a;
 		document.getElementById("addtiers").onclick = addingtiers;
 	}
 
@@ -172,15 +172,15 @@
 		if(tier < limit){
 			var newtier;
 			if(tier == 0){
-				newtier = document.getElementById('tierstable').insertRow(tier);
-				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>"
+				newtier = document.getElementById('tierstable').insertRow(0);
+				newtier.innerHTML = "<th>Tier Amount</th><th>Tier Slots</th><th>Tier Description</th><th></th>";
 			}
-			newtier = document.getElementById('tierstable').insertRow(tier);
+			newtier = document.getElementById('tierstable').insertRow(tier+1);
 			tieramt = '<input type="number" name="proj-tier[AMOUNT][]" required min="1">';
-			tierslot = '<input type="number" name="proj-tier[SLOTS][] min="0">';
+			tierslot = '<input type="number" name="proj-tier[SLOTS][]" min="0">';
 			tiertxt = '<textarea name="proj-tier[TEXT][]" id="proj-info" cols="30" rows="1" required></textarea>';
 			tierrem = '<a href="javascript:void(0)" onclick="remove(this)" id="remtier">Remove Tier</a>';
-			newtier.innerHTML = "<td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td>";
+			newtier.innerHTML = "<tr><td>" + tieramt + "</td><td>" + tierslot +"</td><td>" + tiertxt + "</td><td>" + tierrem + "</td></tr>";
 			tier++;
 			if (tier==limit)	this.parentNode.removeChild(this);
 		} 
