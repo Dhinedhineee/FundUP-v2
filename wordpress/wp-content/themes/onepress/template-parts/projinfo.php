@@ -5,20 +5,30 @@
 	 * @package OnePress
 	 */
 
+    //Automatically gets the root directory of the file. This is helpful for changing website addresses or testing in the localhost.
 	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
 	if ($hostlink == 'http://localhost')		$hostlink .= '/wordpress';
-	if (isset($_GET['view']))		$proj_id = htmlspecialchars($_GET['view']);
+	
+    //Redirection if project ID is empty or in wrong format.
+    if (isset($_GET['view']))		$proj_id = htmlspecialchars($_GET['view']);
 	if (!is_numeric($proj_id))		redirect();
 
-	#DATABASE ACCESS
+    //Database access to get project information.	
 	global $wpdb;
 	$proj_result = $wpdb->get_row("SELECT * FROM projects WHERE proj_id='$proj_id'", ARRAY_A);
 	
-	if($proj_result == null)		redirect();
-	if ($wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=".$proj_result['proj_user_ID']))	redirect();
+    //Redirection if project is either non-existent or project creator is suspended.
+    if($proj_result == null)		redirect();
 
-	get_header();			#PASSED ALL REDIRECTION TESTS.
-	
+	if ($wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=".$proj_result['proj_user_ID']) == 1)	redirect();
+
+    //All undefined access are passed. Headers may now be load.
+	get_header();			
+    
+    /*
+    * This function is used for redirecting the page to the main website
+    * in case of wrong format of project ID, unknown project ID, and suspended projects.
+    */
     function redirect(){
         global $hostlink;
 		header('Location: '.$hostlink);
@@ -28,7 +38,7 @@
 ?>
 
 <?php
-	#PREPROCESSING OF DATA
+	//Project information from database.
 	$proj_title = $proj_result['proj_title'];
 	$proj_user = $proj_result['proj_user'];
 	$proj_goal = $proj_result['proj_goal'];
@@ -40,23 +50,26 @@
 	$user_link = $hostlink."/user-profile/?view=";
 	$proj_img_link = $hostlink."/wp-content/uploads/users/".$proj_user_ID."/".$proj_image;
 
-	#DATABASE ACTIONS
+	//Database access for various project parts.
 	$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_id'");
 	$tier_result = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_id = $proj_id ORDER BY proj_tier_amount");
 	$userpledge_result = $wpdb->get_row("SELECT * FROM user_actions WHERE proj_id='$proj_id' AND user_ID='$current_user->ID'");
 	$pledgers_result = $wpdb->get_results("SELECT * FROM user_actions WHERE proj_ID='$proj_id'", ARRAY_A);
 	$tier_count = (int)$wpdb->get_var("SELECT COUNT(*) FROM proj_tiers WHERE proj_id = $proj_id");
 
-	#PROJECT PARTS TEXTS
-    $proj_finished = 1;  
-    $user_pledge_amt = 0;
-    $backernames = null;
-	$tierdiv = project_tiers();
-	$dldiv = project_deadline();
-	$pledgerdiv = project_pledgers();
-	$pledgeinfodiv = user_pledge_info();
-	$pledgeformdiv = project_pledge_form();
-	$projcommentsdiv = project_comments();
+	
+        $proj_finished = 1;           //Value is one if project is already finished.  
+        $user_pledge_amt = 0;
+        $backernames = null;  
+        foreach ($tier_result as $tier)		$tieramount[] = $tier->proj_tier_amount;
+        
+    //Preprocesses the required HTML texts for the corresponding project information parts:
+	$tierdiv = project_tiers();                  //for the project tiers table.
+	$dldiv = project_deadline();                 //for the project deadline.
+	$pledgerdiv = project_pledgers();            //for the list of pledgers.
+	$pledgeinfodiv = user_pledge_info();         //for the pledge information of the current user viewing the project.
+	$pledgeformdiv = project_pledge_form();      //for the form needed for pledging.
+	$projcommentsdiv = project_comments();       //for the project comments.
 ?>
 
 <!-- START OF HTML -->
@@ -101,6 +114,12 @@
 <!-- END OF HTML -->
 
 <?php
+        /*
+        * This function preprocesses the HTML texts needed for the project tiers table.
+        * If the viewing user is the project creator, list of the project backers per each tier will also be displayed.  
+        *
+        * Returns - string of the HTML texts, empty if there are no project tiers.
+        */
 	function project_tiers(){
 		global $tier_result, $proj_id, $current_user, $proj_user_ID, $backernames, $user_link;
 		if (sizeof($tier_result)){
@@ -117,11 +136,6 @@
 				
 				if (intval($tier_result[$i]->proj_tier_slot) != 0) $tierdiv .= "Slots remaining: ".($tier_result[$i]->proj_tier_slot-$numbacker);
 				else $tierdiv .= "Unlimited slots available.";
-
-				if ($current_user->ID == $proj_user_ID)
-					foreach ($backernames[$i] as $backerid => $backer)
-						$tierdiv .= '<li><a href='.$user_link.$backerid.'>'.$backer.'</a></li>';	
-
 				$tierdiv .= "</td></tr>";	
 			}		
 			$tierdiv .= "</table></div>";
@@ -142,26 +156,17 @@
 			$dldiv .= "This project will end ".($deadline == 0 ? "today.":"in ".($deadline)." day".($deadline > 1 ? "s.":"."));
 			$proj_finished = 0;
 		}
-		else 	$dldiv .= "This project ended ".($deadline == 0 ? "1 day ago.":(-1*$deadline)." days ago.");
+		else 	$dldiv .= "This project ended ".($deadline == -1 ? "yesterday.":($deadline == 0 ? "today.":(-1*$deadline)." days ago."));
 		return $dldiv;
 	}
 
 	function project_pledgers(){
-		global $pledgers_result, $proj_id, $current_user, $proj_user_ID, $user_link;
+		global $pledgers_result, $proj_id, $current_user, $proj_user_ID, $user_link, $hostlink;
 		if(is_user_logged_in() and $current_user->ID == $proj_user_ID){
 			$pledgerdiv = "<hr><h5>PLEDGERS' LIST</h5><hr>";
-			$pledgerdiv .= "<ul>";
-			$pledgecount = 0;
-			if(IsSet($pledgers_result))
-				foreach ($pledgers_result as $list) {
-					$pledgecount++;
-					$pledger = $list['user'];
-					$pledge_amount = $list['fund_given']; 
-					$pledgerlink = "<a href=".$user_link.$list['user_ID'].">$pledger</a>";
-					$pledgerdiv .= '<li>'.$pledgerlink.' - P'.number_format($pledge_amount).'</li> ';
-				}					
-			if(!$pledgecount) $pledgerdiv .= "<p>No pledgers yet.</p>";
-			$pledgerdiv .= "</ul><hr>";
+			$pledgerdiv .= "<div style='text-align:center;'><a href=./pledgers-list/?view=".$proj_id.">";
+			$pledgerdiv .= "<button class='btn btn-secondary-outline btn-lg'style='background-color:#7b1113; color:white;'>";
+			$pledgerdiv .= "See project pledgers' list!</button></a></div>";
 			return $pledgerdiv;
 		} else return '';
 	}
@@ -254,7 +259,7 @@
 	}
 
 	function backersnum($results, $proj_id){	
-		global $tier_count, $tierslots, $tier_result, $pledgers_result, $backernames;
+		global $tier_count, $tierslots, $tier_result, $pledgers_result, $backernames, $tieramount;
 		
 		foreach ($tier_result as $tier)		$tierslots[] = ($tier->proj_tier_slot == 0 ? null:$tier->proj_tier_slot);
 		for ($i = 0; $i < $tier_count; $i++){
@@ -266,6 +271,20 @@
 			for ($i = 0; $i < sizeof($pledgers_result); $i++){
 				if ($pledgers_result[$i] != null){
 					$pledged_tiers = json_decode($pledgers_result[$i]['proj_tier']);
+					for ($j = 0; $j < sizeof($pledged_tiers); $j++){
+						$count = array_search($pledged_tiers[$j], $tieramount);
+						if($count){
+							$backernames[$count][$pledgers_result[$i]['user_ID']] = $pledgers_result[$i]['user'];
+							$backernum[$count]++;
+							if($tierslots[$count] != null)	$tierslots[$count]--;
+						}
+					}
+				}
+			}
+			/*
+			for ($i = 0; $i < sizeof($pledgers_result); $i++){
+				if ($pledgers_result[$i] != null){
+					$pledged_tiers = json_decode($pledgers_result[$i]['proj_tier']);
 					for ($j = 0; $j < $tier_count; $j++)	
 						if ($pledged_tiers[$j] != 0){
 							$backernames[$j][$pledgers_result[$i]['user_ID']] = $pledgers_result[$i]['user'];
@@ -274,6 +293,7 @@
 						}
 				}
 			}
+			*/
 		}else return null;
 		return $backernum;
 	}
@@ -287,18 +307,23 @@
 	}
 
 	function usertierprint($user_pledge){
+		global $tieramount;
+		if (sizeof($tieramount) == 0)		return null;
 		$pledged_tiers = usertier($user_pledge);
 		if ($pledged_tiers == null)		return null;
-		$tierpledge = array_sum($pledged_tiers);
-		if ($tierpledge == null)		return null;
+		$tierpledge = sizeof($pledged_tiers);
+		if ($tierpledge == 0)		return null;
 		$user_tier = 'level'.($tierpledge > 1 ? 's':'').' ';
 		$tierctr = 0;
 		for($i = 0; $i < sizeof($pledged_tiers); $i++){
 			if($pledged_tiers[$i] != 0){
-				if($tierctr >= 1 && $tierpledge > 2) 			  $user_tier .= ', ';
-				if($tierctr == $tierpledge-1 && $tierpledge != 1) $user_tier .= ' and ';
-				$user_tier .= $i+1;
-				$tierctr++;
+				$check = array_search($pledged_tiers[$i], $tieramount);
+				if($check){
+					if($tierctr >= 1 && $tierpledge > 2) 			  $user_tier .= ', ';
+					if($tierctr == $tierpledge-1 && $tierpledge != 1) $user_tier .= ' and ';
+					$user_tier .= $check+1;
+					$tierctr++;
+				}
 			}
 		}
 		return $user_tier;
@@ -310,8 +335,10 @@
 			$projtiers = '<br><label for="pledge"><strong>CHOOSE A PROJECT TIER (OPTIONAL):</strong></label><div id="projecttiers">';
 			echo "<script>window.tierslot = ".json_encode($tierslots)."</script>";
 		}
-		for($i = 0; $i < sizeof($tier_result); $i++)
-			$projtiers .= "<input type='hidden' class='proj-tier' onchange='tierchange()' name='proj-tier[".$i."]'value='".$tier_result[$i]->proj_tier_amount."'><label for='proj_tier[".$i."]' >Tier Level ".($i+1)." (P ".number_format($tier_result[$i]->proj_tier_amount).")</label><br>";
+		for($i = 0; $i < sizeof($tier_result); $i++){
+			$projtiers .= "<input type='hidden' class='proj-tier' onchange='tierchange()' name='proj-tier[".$i."]'value='".$tier_result[$i]->proj_tier_amount."'/>";
+			$projtiers .= "<label for='proj_tier[".$i."]' >Tier Level ".($i+1)." (P ".number_format($tier_result[$i]->proj_tier_amount).")</label><br>";
+		}
 		return $projtiers."</div>";
 	}
 ?>
@@ -325,10 +352,7 @@
         if (parseInt(pledgeval) > 0){
         	document.getElementById("ptcontainer").innerHTML = "<p id='pledgethanks'>THANK YOU FOR YOUR DONATION!</p>";
         	tierlist = document.getElementsByClassName("proj-tier");
-        	for (var i = 0; i < tierlist.length; i++){
-        		if(!tierlist[i].checked || tierlist[i].type=='hidden')	tierlist[i].value = 0;
-        		else 													tierlist[i].value = i+1;
-        	}
+        	for (var i = 0; i < tierlist.length; i++)	if(!tierlist[i].checked || tierlist[i].type=='hidden')	tierlist[i].value = 0;
         }
     }
 
@@ -342,7 +366,6 @@
 			if ((pledgeval-pledgeval2 >= parseInt(tierlist[i].value))|| (tierlist[i].checked && pledgeval >= parseInt(tierlist[i].value))){
     			if(window.tierslot[i] != 0){
 		    		tierlist[i].type = 'checkbox';
-		    		tierlist[i].innerHTML = 'Tier Level ' + (i+1);
 	    		}
     		}	
     		else{

@@ -1,0 +1,62 @@
+#pledgelist {
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+th {
+	text-align: center;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;	
+}
+.pledger_row, td {
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+.pledger_name {
+	text-align: center;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+.fund_given {
+	text-align: center;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+.pledger_tier {
+	text-align: center;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+.pledger_comment {
+	text-align: center;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+.pledger_contact {
+	text-align: center;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+.pledger_date {
+	text-align: center;
+	border-top: 1px solid #e9e9e9;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}

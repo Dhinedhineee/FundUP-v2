@@ -59,7 +59,7 @@
 						if ($projects) {
 							echo '<table class="projects">';
 							foreach ($projects as $project) {
-								echo '<tr><td class="title"><a href="http://localhost/wordpress/edit-project/?edit='.$project['proj_id'].'">[edit]</a> <a href="http://localhost/wordpress/projinfo/?view='.$project['proj_id'].'">'.$project['proj_title'].'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/edit-project/?edit='.$project['proj_id'].'">[edit]</a> <a href="http://localhost/wordpress/projinfo/?view='.$project['proj_id'].'">'.stripcslashes($project['proj_title']).'</a></td><td class="money">Amount raised: P'.$project['proj_fund'].'</td><td class="goal">Goal amount: P'.$project['proj_goal'].'</td></tr>';
 							}
 							echo '</table>';
 						} else {
@@ -72,9 +72,9 @@
 						if ($pledged) {
 							echo '<table class="projects">';
 							foreach ($pledged as $project) {
-								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_ID'].'">'.$project['proj_title'].'</a></td><td class="money">Amount pledged: P'.$project['fund_given'].'</td>';
+								echo '<tr><td class="title"><a href="http://localhost/wordpress/projinfo/?view='.$project['proj_ID'].'">'.stripcslashes($project['proj_title']).'</a></td><td class="money">Amount pledged: P'.$project['fund_given'].'</td>';
 								if ($project['user_comment']) {
-									echo '<td class="comment">Comment: '.$project['user_comment'].'</td></tr>';
+									echo '<td class="comment">Comment: '.stripcslashes($project['user_comment']).'</td></tr>';
 								} else {
 									echo '<td class="comment">You did not comment on this pledge.</td></tr>';
 								}

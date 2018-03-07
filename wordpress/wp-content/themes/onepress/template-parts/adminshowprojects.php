@@ -57,7 +57,7 @@
 								foreach ($projects as $project) {
 									echo '<tr>
 											<td class="name">
-												'.$project['proj_title'].' by ' .$project['proj_user']. '
+												'.stripcslashes($project['proj_title']).' by ' .$project['proj_user']. '
 											</td>
 											<td class="options">
 												<a href="http://localhost/wordpress/projinfo/?view=' .$project['proj_id']. '">[View]</a>
