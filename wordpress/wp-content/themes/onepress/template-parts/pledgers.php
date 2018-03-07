@@ -131,6 +131,7 @@
 					$user_tier = json_decode($a->proj_tier);
 					$user_tier_str = '';
 					$count = 0;
+                    if($user_tier != null)
 					for ($j = 0; $j < count($proj_tiers); $j++){
 						$check = array_search((int)$proj_tiers[$j]->proj_tier_amount, $user_tier);
 						if ($check === 0 || $check){
