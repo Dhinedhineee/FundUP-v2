@@ -55,10 +55,10 @@
 		else{
 			$action_date = $pledged['action_date'];
 			if($user_comment == '')		$user_comment = $pledged['user_comment'];
-			else if ($pledged['user_comment'] != $user_comment){
+			#else if ($pledged['user_comment'] != $user_comment){
 				date_default_timezone_set('Asia/Manila');
 				$action_date = date('Y/m/d H:i:s', time());
-			}
+			#}
 			if ($pledge_amount == 0)
 				$wpdb->delete('user_actions', array('user_ID' => $pledger_ID, 'proj_ID' => $proj_ID));
 			else

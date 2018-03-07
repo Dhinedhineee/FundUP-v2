@@ -5,31 +5,32 @@
 	 * @package OnePress
 	 */
 
-        //Automatically gets the root directory of the file. This is helpful for changing website addresses or testing in the localhost.
+    //Automatically gets the root directory of the file. This is helpful for changing website addresses or testing in the localhost.
 	$hostlink = 'http://'.$_SERVER['HTTP_HOST'];
 	if ($hostlink == 'http://localhost')		$hostlink .= '/wordpress';
 	
-        //Redirection if project ID is empty or in wrong format.
-        if (isset($_GET['view']))		$proj_id = htmlspecialchars($_GET['view']);
+    //Redirection if project ID is empty or in wrong format.
+    if (isset($_GET['view']))		$proj_id = htmlspecialchars($_GET['view']);
 	if (!is_numeric($proj_id))		redirect();
 
-        //Database access to get project information.
+    //Database access to get project information.	
 	global $wpdb;
 	$proj_result = $wpdb->get_row("SELECT * FROM projects WHERE proj_id='$proj_id'", ARRAY_A);
 	
-        //Redirection if project is either non-existent or project creator is suspended.
-        if($proj_result == null)		redirect();
-	if ($wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=".$proj_result['proj_user_ID']))	redirect();
+    //Redirection if project is either non-existent or project creator is suspended.
+    if($proj_result == null)		redirect();
 
-        //All undefined access are passed. Headers may now be load.
+	if ($wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=".$proj_result['proj_user_ID']) == 1)	redirect();
+
+    //All undefined access are passed. Headers may now be load.
 	get_header();			
-        
-        /*
-        * This function is used for redirecting the page to the main website
-        * in case of wrong format of project ID, unknown project ID, and suspended projects.
-        */
-        function redirect(){
-                global $hostlink;
+    
+    /*
+    * This function is used for redirecting the page to the main website
+    * in case of wrong format of project ID, unknown project ID, and suspended projects.
+    */
+    function redirect(){
+        global $hostlink;
 		header('Location: '.$hostlink);
 		die();
 	}
@@ -62,7 +63,7 @@
         $backernames = null;  
         foreach ($tier_result as $tier)		$tieramount[] = $tier->proj_tier_amount;
         
-        //Preprocesses the required HTML texts for the corresponding project information parts:
+    //Preprocesses the required HTML texts for the corresponding project information parts:
 	$tierdiv = project_tiers();                  //for the project tiers table.
 	$dldiv = project_deadline();                 //for the project deadline.
 	$pledgerdiv = project_pledgers();            //for the list of pledgers.
@@ -135,11 +136,6 @@
 				
 				if (intval($tier_result[$i]->proj_tier_slot) != 0) $tierdiv .= "Slots remaining: ".($tier_result[$i]->proj_tier_slot-$numbacker);
 				else $tierdiv .= "Unlimited slots available.";
-
-				if ($current_user->ID == $proj_user_ID)
-					foreach ($backernames[$i] as $backerid => $backer)
-						$tierdiv .= '<li><a href='.$user_link.$backerid.'>'.$backer.'</a></li>';	
-
 				$tierdiv .= "</td></tr>";	
 			}		
 			$tierdiv .= "</table></div>";
@@ -165,21 +161,12 @@
 	}
 
 	function project_pledgers(){
-		global $pledgers_result, $proj_id, $current_user, $proj_user_ID, $user_link;
+		global $pledgers_result, $proj_id, $current_user, $proj_user_ID, $user_link, $hostlink;
 		if(is_user_logged_in() and $current_user->ID == $proj_user_ID){
 			$pledgerdiv = "<hr><h5>PLEDGERS' LIST</h5><hr>";
-			$pledgerdiv .= "<ul>";
-			$pledgecount = 0;
-			if(IsSet($pledgers_result))
-				foreach ($pledgers_result as $list) {
-					$pledgecount++;
-					$pledger = $list['user'];
-					$pledge_amount = $list['fund_given']; 
-					$pledgerlink = "<a href=".$user_link.$list['user_ID'].">$pledger</a>";
-					$pledgerdiv .= '<li>'.$pledgerlink.' - P'.number_format($pledge_amount).'</li> ';
-				}					
-			if(!$pledgecount) $pledgerdiv .= "<p>No pledgers yet.</p>";
-			$pledgerdiv .= "</ul><hr>";
+			$pledgerdiv .= "<div style='text-align:center;'><a href=./pledgers-list/?view=".$proj_id.">";
+			$pledgerdiv .= "<button class='btn btn-secondary-outline btn-lg'style='background-color:#7b1113; color:white;'>";
+			$pledgerdiv .= "See project pledgers' list!</button></a></div>";
 			return $pledgerdiv;
 		} else return '';
 	}
@@ -348,8 +335,10 @@
 			$projtiers = '<br><label for="pledge"><strong>CHOOSE A PROJECT TIER (OPTIONAL):</strong></label><div id="projecttiers">';
 			echo "<script>window.tierslot = ".json_encode($tierslots)."</script>";
 		}
-		for($i = 0; $i < sizeof($tier_result); $i++)
-			$projtiers .= "<input type='hidden' class='proj-tier' onchange='tierchange()' name='proj-tier[".$i."]'value='".$tier_result[$i]->proj_tier_amount."'><label for='proj_tier[".$i."]' >Tier Level ".($i+1)." (P ".number_format($tier_result[$i]->proj_tier_amount).")</label><br>";
+		for($i = 0; $i < sizeof($tier_result); $i++){
+			$projtiers .= "<input type='hidden' class='proj-tier' onchange='tierchange()' name='proj-tier[".$i."]'value='".$tier_result[$i]->proj_tier_amount."'/>";
+			$projtiers .= "<label for='proj_tier[".$i."]' >Tier Level ".($i+1)." (P ".number_format($tier_result[$i]->proj_tier_amount).")</label><br>";
+		}
 		return $projtiers."</div>";
 	}
 ?>
@@ -377,7 +366,6 @@
 			if ((pledgeval-pledgeval2 >= parseInt(tierlist[i].value))|| (tierlist[i].checked && pledgeval >= parseInt(tierlist[i].value))){
     			if(window.tierslot[i] != 0){
 		    		tierlist[i].type = 'checkbox';
-		    		tierlist[i].innerHTML = 'Tier Level ' + (i+1);
 	    		}
     		}	
     		else{
