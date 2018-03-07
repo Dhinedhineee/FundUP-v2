@@ -21,7 +21,7 @@
 	if(!isset($result)) 								redirect();
 	if($result['proj_user_ID'] != $current_user->ID)	redirect();
 	if($current_user->suspended)						redirect();
-	if($wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=".$result['proj_user_ID'].))	redirect();
+	if($wpdb->get_var("SELECT suspended FROM wp_users WHERE ID=".$result['proj_user_ID']))	redirect();
 
 	#checks user login, user proj creator, input check, user not suspended
 	get_header();		#HEADER - PASSED ALL REDIRECTION TESTS
@@ -61,7 +61,7 @@
 	}
 ?>
 
-<link rel="stylesheet" type="text/css" href="../wp-content/themes/onepress/assets/css/pledgers.css?ver=<?php echo rand(111,999)?>">
+<link rel="stylesheet" type="text/css" href="../../wp-content/themes/onepress/assets/css/pledgers.css?ver="<?php echo rand(111,999)?>>
 <html>
 <body>
 <div id="content" class="site-content">
@@ -252,8 +252,10 @@
 
 	function sort_date(){
 		if (document.getElementById("pledgedate").checked == false)		return;
-		document.getElementById("sorttiers").checked = false;
-		document.getElementById("amtfund").checked = false;
+                if (document.getElementById("sorttiers") != null)
+                        document.getElementById("sorttiers").checked = false;
+                if (document.getElementById("amtfund") != null)
+                        document.getElementById("amtfund").checked = false;
 
 		var switching, shouldSwitch, i, x, y, rows;
 		table = document.getElementById("pledgelist");
@@ -279,8 +281,10 @@
 
 	function sort_amount(){
 		if (document.getElementById("amtfund").checked == false)		return;
-		document.getElementById("sorttiers").checked = false;
-		document.getElementById("pledgedate").checked = false;
+                if (document.getElementById("sorttiers") != null)
+                        document.getElementById("sorttiers").checked = false;
+                if (document.getElementById("pledgedate") != null)
+                        document.getElementById("pledgedate").checked = false;
 
 		var switching, shouldSwitch, i, x, y, rows;
 		table = document.getElementById("pledgelist");
@@ -306,8 +310,10 @@
 
 	function sort_tiers(){
 		if (document.getElementById("sorttiers").checked == false)		return;
-		document.getElementById("pledgedate").checked = false;
-		document.getElementById("amtfund").checked = false;
+		if (document.getElementById("pledgedate") != null)
+                        document.getElementById("pledgedate").checked = false;
+                if (document.getElementById("amtfund") != null)
+                        document.getElementById("amtfund").checked = false;
 
 		var switching, shouldSwitch, i, x, y, rows;
 		table = document.getElementById("pledgelist");
