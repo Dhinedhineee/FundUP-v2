@@ -47,12 +47,16 @@
 	
 
 	$proj_tiers = $wpdb->get_results("SELECT * FROM proj_tiers WHERE proj_ID='$proj_ID' ORDER BY proj_tier_amount");
+	$proj_fund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_ID'");
 	$nopledge = '';
 	$sortpledgers = '';
 	$tieronly = '';
 	$pledgerslist = '';
 
 	if(count($pledgers) != 0){
+		$counttier = countthem();
+		$nopledge = '<h2>This project has '.sizeof($pledgers).' pledger'.(sizeof($pledgers) > 1 ? 's':'');
+		$nopledge .= ' with total amount pledged of P'.number_format($proj_fund).'.</h2><br>';
 		$sortpledgers = sortlist();
 		$tieronly = choosetieronly();
 		$pledgerslist = pledgerslisttext();
@@ -61,7 +65,7 @@
 	}
 ?>
 
-<link rel="stylesheet" type="text/css" href="../../wp-content/themes/onepress/assets/css/pledgers.css?ver="<?php echo rand(111,999)?>>
+<link rel="stylesheet" type="text/css" href="../../wp-content/themes/onepress/assets/css/pledgers.css?ver"<?php echo rand(111,999)?>>
 <html>
 <body>
 <div id="content" class="site-content">
@@ -97,6 +101,21 @@
 
 
 <?php 
+	function countthem(){
+		global $pledgers, $proj_tiers;
+		for ($i = 0; $i < sizeof($proj_tiers); $i++)	$counttier[$proj_tiers[$i]->proj_tier_amount] = 0;
+
+		foreach ($pledgers as $a){
+			if ($a->proj_tier != null){
+				$usertier = json_decode($a->proj_tier);
+                if ($usertier == null)     continue; 
+				foreach ($usertier as $tier) 	
+                    if (isset($counttier[$tier]))	$counttier[$tier] += 1;
+			}
+		}
+		return $counttier;
+	}
+
 	function pledgerslisttext(){
 		global $proj_tiers, $pledgers, $hostlink, $userlink;
 		$pledgerslist = '';
@@ -176,16 +195,24 @@
 	}
 
 	function choosetieronly(){
-		global $proj_tiers;
+		global $proj_tiers, $wpdb, $proj_ID, $counttier;
 		$tieronly = '';
 
 		if(count($proj_tiers) == 0) return $tieronly;
 		$tieronly .= "<h4>Show pledgers only on: </h4>";
-		$tieronly .= "<input type='checkbox' class='tieronly' value=-1 onchange=notier()>No pledged tier.</input><br>";
+		$tieronly .= "<table id='ct'>";
+		$numpledger = $wpdb->get_var("SELECT COUNT(*) FROM user_actions WHERE proj_ID='$proj_ID' AND proj_tier IS NULL");
+		$numpledgerfund = $wpdb->get_var("SELECT SUM(fund_given) FROM user_actions WHERE proj_ID='$proj_ID' AND proj_tier IS NULL");
+		$tieronly .= "<tr><td  class='ctcheckbox'><input type='checkbox' class='tieronly' value=-1 onchange=notier()></input></td>";
+		$tieronly .= "<td class='ctname'>No pledged tier </td><td class='ctpledgers'>".$numpledger." pledger".($numpledger > 1 ? 's':'')."</td><td class='ctamount'>P ".number_format($numpledgerfund)." total</td></tr>";
+
 		for($i = 0; $i < count($proj_tiers); $i++){
-			$tieronly .= "<input type='checkbox' class='tieronly' value='".($i+1)."' onchange=tieronly()>Tier Level ".($i+1)." (P ".number_format($proj_tiers[$i]->proj_tier_amount).")</input><br>";
+			$tieronly .= "<tr><td class='ctcheckbox'><input type='checkbox' class='tieronly' value='".($i+1)."' onchange=tieronly()></input></td>";
+			$tieronly .= "<td class='ctname'>Tier Level ".($i+1)." (P ".number_format($proj_tiers[$i]->proj_tier_amount).")</td>";
+			$count = $counttier[$proj_tiers[$i]->proj_tier_amount];
+			$tieronly .= "<td class='ctpledgers'>".$count." pledger".($count > 1 ? 's':'')."</td><td class='ctamount'>P ".number_format($count*$proj_tiers[$i]->proj_tier_amount)." total</td></tr>\n";
 		}
-		return $tieronly.'<br>';
+		return $tieronly.'</table><br>';
 	}
 
 ?>
