@@ -11,11 +11,40 @@
 	$layout = onepress_get_layout();
 ?>
 <style>
+.tooltip {
+
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted red;
+}
+/* Tooltip text */
+#tooltip #tooltiptext {
+    visibility: hidden;
+    width: 180px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    
+    top: 20%;
+    left:90%;
+    
+
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+#tooltip:hover #tooltiptext {
+    visibility: visible;
+}
+
 #myInput {
-    width: 100%; /* Full-width */
+    width: 90%; /* Full-width */
     font-size: 16px; /* Increase font-size */
     border: 1px solid #ddd; /* Add a grey border */
-		margin-bottom: 10px;
+	margin-bottom: 10px;
+	margin-right: 10px;
 }
 
 #myUL {
@@ -58,7 +87,12 @@
 		<div id="content-inside" class="container <?php echo esc_attr( $layout ); ?>">
 			<div id="primary" class="content-area">
 				<main id="main" class="site-main" role="main">
-					<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for projects..">
+					<div>
+					<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for projects.."/>
+					<span id="tooltip">?
+						<span id="tooltiptext">Use the search bar to look for the project you want to find.</span>
+					</span>
+					</div>
 					<ul id="myUL">
 					<?php
 						$link = mysqli_connect("localhost", "root", "", "wordpress");
