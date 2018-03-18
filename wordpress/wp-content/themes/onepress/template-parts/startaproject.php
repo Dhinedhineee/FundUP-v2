@@ -18,6 +18,25 @@
 ?>
 <head>
 
+<style>
+/* Tooltip text */
+#tooltip #tooltiptext {
+    visibility: hidden;
+    width: 180px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 5px;
+    border-radius: 6px;
+    top: 20%;
+    left:90%;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+#tooltip:hover #tooltiptext {
+    visibility: visible;
+}
+</style>
 
 
 </head>
@@ -36,11 +55,13 @@
 	
 	<p><label> Project Name<br>
 	<span class="proj-name-field"><input type="text" required name="proj-name" size="40" id="proj-name"/>
-	<span id="titlealert"></span></span></label></p>
-
+	<span id="titlealert"></span>
+	<span id="tooltip">?<span id="tooltiptext">Describe your project in a few words.</span>
+	</span></label></p>
 	<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
 	<span class="goal-amount"><input type="number" required name="goal-amount" id="goal-amount" min="10000" max="10000000"
-	 value="10000"/></span><br>
+	 value="10000"/></span>
+	 <span id="tooltip">?<span id="tooltiptext">How much money do you want to raise?</span></span><br>
 	<span class="goal-amount"><input type="range" name="goal-range" id="goal-range" value="10000" class="wpcf7-form-control wpcf7-number wpcf7-validates-as-required wpcf7-validates-as-number" aria-required="true" aria-invalid="false" min="10000" max="10000000" oninput="goalchange(this.value)" onchange="slidechange(this.value)" required/>
 	</label></p>
 	
@@ -50,11 +71,13 @@
 		$mindate = date_default_timezone_set('Asia/Manila');
 		$mindate = date('Y-m-d');
 		echo '
-		<p><label> Project Deadline<br />
-		<input type="date" name="proj-deadline" id="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'" value="'.$mindate.'"/></span></label><span></span></p>';
+		<p><label> Project Deadline<br/>
+		<input type="date" name="proj-deadline" id="proj-deadline" aria-required="true" aria-invalid="false" required min="'.$mindate.'" value="'.$mindate.'"/>
+		<span id="tooltip">?<span id="tooltiptext">When is the last day that your project is available for pledging?</span></span>
+		</label></p>';
 	?>
 
-	<p><label> Project Information<br>
+	<p><label> Project Information <br>
 	<textarea name="proj-info" id="proj-info" cols="40" rows="10" required></textarea>
 	<span id="infoalert"></span></label></p>
 
@@ -64,7 +87,7 @@
 		</span></label>
 	</label>
 
-	<p><label> Project Photo<label> Upload a photo (jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)" required/><br><span id="FileError"></span></span></label>	
+	<p><label> Project Photo<label>[REQUIRED] Upload a photo (jpg/jpeg/gif/png, max 7MB)<br><span class="wpcf7-form-control-wrap image"><input type="file" name="proj-image" id="proj-image" size="40" accept="image/jpeg,image/gif,image/png,image/pjpeg" onchange="verifyMe(this)" required/><br><span id="FileError"></span></span></label>	
 	</label></p>
 				
 	<p><input type="submit" id="submitbtn" value="Submit"/></p>

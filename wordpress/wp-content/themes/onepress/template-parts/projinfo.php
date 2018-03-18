@@ -153,10 +153,10 @@
 		$et = $hey->diff($localtime);
 		$deadline = $et->format('%R%a')*-1;
 		if($et->invert == 1){
-			$dldiv .= "This project will end ".($deadline == 0 ? "today.":"in ".($deadline)." day".($deadline > 1 ? "s.":"."));
+			$dldiv .= "This project will end ".($deadline == 0 ? "tomorrow":"on ".date_format($hey,"F d, Y")).".";
 			$proj_finished = 0;
 		}
-		else 	$dldiv .= "This project ended ".($deadline == -1 ? "yesterday.":($deadline == 0 ? "today.":(-1*$deadline)." days ago."));
+		else $dldiv .= "This project ended ".($deadline == 1 ? "today":"on ".date_format($hey,"F d, Y")).".";
 		return $dldiv;
 	}
 
@@ -273,7 +273,7 @@
 					$pledged_tiers = json_decode($pledgers_result[$i]['proj_tier']);
 					for ($j = 0; $j < sizeof($pledged_tiers); $j++){
 						$count = array_search($pledged_tiers[$j], $tieramount);
-						if($count){
+						if($count === 0 || $count){
 							$backernames[$count][$pledgers_result[$i]['user_ID']] = $pledgers_result[$i]['user'];
 							$backernum[$count]++;
 							if($tierslots[$count] != null)	$tierslots[$count]--;
@@ -281,19 +281,6 @@
 					}
 				}
 			}
-			/*
-			for ($i = 0; $i < sizeof($pledgers_result); $i++){
-				if ($pledgers_result[$i] != null){
-					$pledged_tiers = json_decode($pledgers_result[$i]['proj_tier']);
-					for ($j = 0; $j < $tier_count; $j++)	
-						if ($pledged_tiers[$j] != 0){
-							$backernames[$j][$pledgers_result[$i]['user_ID']] = $pledgers_result[$i]['user'];
-							$backernum[$j]++;
-							if($tierslots[$j] != null)	$tierslots[$j]--;
-						}
-				}
-			}
-			*/
 		}else return null;
 		return $backernum;
 	}
@@ -315,13 +302,13 @@
 		if ($tierpledge == 0)		return null;
 		$user_tier = 'level'.($tierpledge > 1 ? 's':'').' ';
 		$tierctr = 0;
-		for($i = 0; $i < sizeof($pledged_tiers); $i++){
+		for($i = 0; $i < $tierpledge; $i++){
 			if($pledged_tiers[$i] != 0){
 				$check = array_search($pledged_tiers[$i], $tieramount);
-				if($check){
+				if($check === 0 || $check){
 					if($tierctr >= 1 && $tierpledge > 2) 			  $user_tier .= ', ';
 					if($tierctr == $tierpledge-1 && $tierpledge != 1) $user_tier .= ' and ';
-					$user_tier .= $check+1;
+					$user_tier .= ($check+1);
 					$tierctr++;
 				}
 			}

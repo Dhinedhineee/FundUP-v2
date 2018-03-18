@@ -67,6 +67,27 @@
     if($currdate < $mindate) $mindate = $currdate;
 ?>	
 
+<style>
+/* Tooltip text */
+#tooltip #tooltiptext {
+    visibility: hidden;
+    width: 180px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 5px;
+    border-radius: 6px;
+    top: 20%;
+    left:90%;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+#tooltip:hover #tooltiptext {
+    visibility: visible;
+}
+</style>
+
+
 <div id="content" class="site-content">
 	<div class="page-header">
 		<div class="container">
@@ -82,18 +103,19 @@
 			<p><label> Project Name<br />
     		<span class="proj-name">
     			<input type="text" name="proj-name" size="40" value="<?= $proj_title?>"id="proj-name" required/><span id="titlealert"></span>
-			</span></label></p>
+			<span id="tooltip">?<span id="tooltiptext">Describe your project in a few words.</span></span></span></label></p>
 
 			<p><label> Goal Amount (Minimum of P10K, Maximum of P10M)<br />
 			<span class="goal-amount">
-				<input type="number" name="goal-amount" id="goal-amount" value=<?= $proj_goal?> min="10000" max="10000000" onkeyup="slidechange(this.value)" required/></br>	
+				<input type="number" name="goal-amount" id="goal-amount" value=<?= $proj_goal?> min="10000" max="10000000" onkeyup="slidechange(this.value)" required/>
+				<span id="tooltip">?<span id="tooltiptext">How much money do you want to raise?</span></span></br>	
 				<input type="range" name="goal-range" id="goal-range" value=<?= $proj_goal?>  min="10000" max="10000000" oninput="goalchange(this.value)"  onchange="slidechange(this.value)" required/>
 			</span></label><span><?= $fundtext?></span></p>
 
 			<p><label> Project Deadline<br />
 			<span class="goal-deadline">
 				<input type="date" name="proj-deadline" id="proj-deadline" required value=<?= $proj_deadline?> min=<?= $mindate?> max="2099-12-31"/>
-			</span></label><span><?= $funddate?></span></p>
+			</span><span id="tooltip">?<span id="tooltiptext">When is the last day that your project is available for pledging?</span></span></label><span><?= $funddate?></span></p>
 
 			<p><label> Project Information<br />
 			<span class="proj-info">

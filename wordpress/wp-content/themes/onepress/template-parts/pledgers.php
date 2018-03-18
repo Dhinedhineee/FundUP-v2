@@ -61,7 +61,7 @@
 		$tieronly = choosetieronly();
 		$pledgerslist = pledgerslisttext();
 	}else {
-		$nopledge = '<h3>This project has no pledgers yet.</h3>';
+		$nopledge = '<h3>This project has no pledgers.</h3>';
 	}
 ?>
 
