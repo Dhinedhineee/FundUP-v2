@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 19, 2018 at 11:52 AM
+-- Generation Time: Mar 19, 2018 at 12:04 PM
 -- Server version: 5.7.19
 -- PHP Version: 5.6.31
 
@@ -1572,7 +1572,7 @@ CREATE TABLE IF NOT EXISTS `wp_users` (
 --
 
 INSERT INTO `wp_users` (`ID`, `user_login`, `user_pass`, `user_nicename`, `user_email`, `user_url`, `user_registered`, `user_activation_key`, `user_status`, `display_name`, `spam`, `deleted`, `suspended`) VALUES
-(1, 'upbasedcf', '$P$BceQu3ZUZdmtB09b9GkbUx84W3a0KS0', 'upbasedcf', 'upbasedcf@gmail.com', 'https://somerandomwebsite.com', '2017-09-14 13:57:16', '', 0, '', 0, 0, 0),
+(1, 'upbasedcf', '$P$BceQu3ZUZdmtB09b9GkbUx84W3a0KS0', 'upbasedcf', 'upbasedcf@gmail.com', 'https://somerandomwebsite.com', '2017-09-14 13:57:16', '', 0, 'upbasedcf', 0, 0, 0),
 (2, 'dhinedhineee', '$P$B/hEVheVtj5fGk57QKyK2KndFTKdwY0', 'dhinedhineee', 'dhinedhineeee@gmail.com', '', '2017-09-23 14:01:56', '1506175489:$P$BFiLV71PDaSKUuF7f0RrVZOf8a5M8b0', 0, 'Geraldine', 0, 0, 0),
 (3, 'dindin_gsyahoo-com', '$P$BP4uwh44x0PX6qQcufFpcBnCNbnt/q.', 'dindin_gsyahoo-com', 'dindin_gs@yahoo.com', '', '2017-10-10 12:30:16', '', 0, 'Dindin', 0, 0, 0),
 (6, 'davebalacuitgmail-com', '$P$B5ueYfjw70Qhi.yrTRQcLEgNDix17F1', 'davebalacuitgmail-com', 'davebalacuit@gmail.com', '', '2017-10-15 07:49:10', '', 0, 'davebalacuitgmail-com', 0, 0, 0),
