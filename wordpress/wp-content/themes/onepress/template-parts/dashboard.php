@@ -49,6 +49,7 @@
 					<span id="tooltip">&nbsp;&nbsp;?
 						<span id="tooltiptext">The list of the projects you created. You can view a project by clicking on its title, or edit a project by clicking on the "edit" button beside its title.</span>
 					</span>
+					<br />
 					<?php
 						if ($projects) {
 							echo '<table class="projects">';
@@ -65,6 +66,7 @@
 					<span id="tooltip">&nbsp;&nbsp;?
 						<span id="tooltiptext">The list of the projects created by others that you pledged in. You can view a project by clicking on its title.</span>
 					</span>
+					<br />
 					<?php
 						if ($pledged) {
 							echo '<table class="projects">';

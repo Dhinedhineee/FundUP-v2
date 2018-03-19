@@ -11,12 +11,6 @@
 	$layout = onepress_get_layout();
 ?>
 <style>
-.tooltip {
-
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted red;
-}
 /* Tooltip text */
 #tooltip #tooltiptext {
     visibility: hidden;
