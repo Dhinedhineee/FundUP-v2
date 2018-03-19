@@ -52,6 +52,9 @@
 						} else {
 							echo '<a href="http://localhost/wordpress/admin-dashboard"><< Back</a><br /><br />';
 							echo '<h2 class="label">List of Users</h2>';
+							echo '<span id="tooltip">&nbsp;&nbsp;?
+									<span id="tooltiptext">The list of registered users. You can view their profile, suspend their account (prevent them from accessing their account), or delete their account.</span>
+								</span>';
 							if ($users) {
 								echo '<table class="display">';
 								foreach ($users as $user) {
