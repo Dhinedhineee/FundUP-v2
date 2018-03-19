@@ -16,6 +16,8 @@
 	$layout = onepress_get_layout();
 ?>
 
+<link rel="stylesheet" type="text/css" href="../wp-content/themes/onepress/assets/css/login.css?ver=<?php echo rand(111,999)?>">
+
 	<div id="content" class="site-content">
 
 		<div class="page-header">

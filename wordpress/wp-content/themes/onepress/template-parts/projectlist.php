@@ -40,7 +40,7 @@
 }
 
 #myInput {
-    width: 90%; /* Full-width */
+    width: 33%; /* Full-width */
     font-size: 16px; /* Increase font-size */
     border: 1px solid #ddd; /* Add a grey border */
 	margin-bottom: 10px;
