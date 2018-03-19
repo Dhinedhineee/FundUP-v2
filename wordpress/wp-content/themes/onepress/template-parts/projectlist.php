@@ -24,14 +24,10 @@
     background-color: black;
     color: #fff;
     text-align: center;
-    padding: 5px 0;
+    padding: 4px 4px;
+    margin: 0 5px;
     border-radius: 6px;
     position: absolute;
-    
-    top: 20%;
-    left:90%;
-    
-
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
