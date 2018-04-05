@@ -55,3 +55,24 @@ td a {
 td a:hover {
 	text-decoration: none;
 }
+
+#tooltip #tooltiptext {
+    visibility: hidden;
+    width: 300px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 4px 4px;
+    margin: 0 5px;
+    border-radius: 6px;
+    position: absolute;
+    
+}
+
+#tooltip:hover #tooltiptext {
+    visibility: visible;
+}
+
+h2 {
+  display: inline-block;
+}

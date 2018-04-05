@@ -42,19 +42,14 @@
 				<main id="main" class="site-main" role="main">
 
 					<?php echo '<h1 class="name">Welcome back, '.$user_name.'!</h1>' ?>
-					<?php
-						//if ($user_image) {
-						//	$img = "/wordpress".$user_image;
-						//} else {
-						//	$img = "/wordpress/wp-content/default/default.png";
-						//}
-						//echo '<img src="'.$img.'" alt="'.$user_image.'" class="userimg" />';
-					?>
 					<?php echo '<a href="http://localhost/wordpress/user-profile/?view='.$user_ID.'">View Profile</a><br />' ?>
 					<a href="http://localhost/wordpress/edit-profile">Edit Profile</a><br />
-					<!-- <a href="http://localhost/wordpress/change-profile-picture">Change Profile Picture</a><br/ > -->
 					<br />
 					<h2 class="label">My Projects</h2>
+					<span id="tooltip">&nbsp;&nbsp;?
+						<span id="tooltiptext">The list of the projects you created. You can view a project by clicking on its title, or edit a project by clicking on the "edit" button beside its title.</span>
+					</span>
+					<br />
 					<?php
 						if ($projects) {
 							echo '<table class="projects">';
@@ -68,6 +63,10 @@
 					?>
 					<br />
 					<h2 class="label">Projects I Pledged In</h2>
+					<span id="tooltip">&nbsp;&nbsp;?
+						<span id="tooltiptext">The list of the projects created by others that you pledged in. You can view a project by clicking on its title.</span>
+					</span>
+					<br />
 					<?php
 						if ($pledged) {
 							echo '<table class="projects">';

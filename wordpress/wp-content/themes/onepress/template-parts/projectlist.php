@@ -11,12 +11,6 @@
 	$layout = onepress_get_layout();
 ?>
 <style>
-.tooltip {
-
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted red;
-}
 /* Tooltip text */
 #tooltip #tooltiptext {
     visibility: hidden;
@@ -24,14 +18,10 @@
     background-color: black;
     color: #fff;
     text-align: center;
-    padding: 5px 0;
+    padding: 4px 4px;
+    margin: 0 5px;
     border-radius: 6px;
     position: absolute;
-    
-    top: 20%;
-    left:90%;
-    
-
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
@@ -40,7 +30,7 @@
 }
 
 #myInput {
-    width: 90%; /* Full-width */
+    width: 33%; /* Full-width */
     font-size: 16px; /* Increase font-size */
     border: 1px solid #ddd; /* Add a grey border */
 	margin-bottom: 10px;

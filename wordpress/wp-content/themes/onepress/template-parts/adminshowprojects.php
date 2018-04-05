@@ -52,6 +52,9 @@
 						} else {
 							echo '<a href="http://localhost/wordpress/admin-dashboard"><< Back</a><br /><br />';
 							echo '<h2 class="label">List of Projects</h2>';
+							echo '<span id="tooltip">&nbsp;&nbsp;?
+									<span id="tooltiptext">The list of projects created by users. You can view a project, or delete a project.</span>
+								</span>';
 							if ($projects) {
 								echo '<table class="display">';
 								foreach ($projects as $project) {
