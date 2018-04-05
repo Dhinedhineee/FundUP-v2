@@ -115,7 +115,7 @@
 						    %s <br> by %s
 						    </a>
 						    <p style=\"overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;\">%s</p>
-						    </li>", $row["proj_id"],$row["proj_user_ID"],$row["proj_image"],stripcslashes($row["proj_title"]),$row["proj_user"],stripcslashes($row["proj_info"]));
+						    </li>", $row["proj_id"],$row["proj_user_ID"],$row["proj_image"],stripcslashes($row["proj_title"]),$row["proj_user"],stripcslashes(str_replace("\n", "<br>", $row["proj_info"])));
 						    }
 
 						    /* free result set */
